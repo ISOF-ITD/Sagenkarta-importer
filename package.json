@@ -1,0 +1,15 @@
+{
+  "name": "sagenkarta-data-process",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Instituten för språk och folkminnen/Trausti Dagsson",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.11.1",
+    "underscore": "^1.8.3"
+  }
+}
