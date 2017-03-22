@@ -34,13 +34,11 @@ function formatCategory(category) {
 	return category.substr(0, 1);
 }
 
-var legendsData = fs.readFileSync('records-2017-03-09.json');
-var personsData = fs.readFileSync('persons-2017-03-09.json');
-var sockenData = fs.readFileSync('socken.json');
+var legendsData = fs.readFileSync('input/records-2017-03-09.json');
+var personsData = fs.readFileSync('input/persons-2017-03-09.json');
 
 var legends = JSON.parse(legendsData);
 var persons = JSON.parse(personsData);
-var places = JSON.parse(sockenData);
 
 console.log('legends: '+legends.length);
 
@@ -63,7 +61,6 @@ var connection = mysql.createConnection({
 connection.connect();
 connection.query('TRUNCATE TABLE persons');
 connection.query('TRUNCATE TABLE records');
-//connection.query('TRUNCATE TABLE socken');
 connection.query('TRUNCATE TABLE persons_places');
 connection.query('TRUNCATE TABLE records_persons');
 connection.query('TRUNCATE TABLE records_places');
@@ -73,19 +70,6 @@ connection.query('TRUNCATE TABLE media');
 connection.query('TRUNCATE TABLE records_media');
 
 var genders = _.uniq(_.pluck(persons, 'gender'));
-/*
-_.each(places, function(place) {
-	var query = 'INSERT INTO socken ('+
-		'id, name, harad, lat, lng) VALUES ('+
-			'"'+place.SockenId+'", '+
-			'"'+place.Socken+'", '+
-			place.harad+', '+
-			(place.Lat && Number(place.Lat.replace(',', '.')) > 0 ? Number(place.Lat.replace(',', '.')) : 'null')+', '+
-			(place.Long && Number(place.Long.replace(',', '.')) > 0 ? Number(place.Long.replace(',', '.')) : 'null')+')'
-	;
-	connection.query(query);
-});
-*/
 
 var processPerson = function(person) {
 	var personId = Number(person.id.replace(/p|P/, ''));
