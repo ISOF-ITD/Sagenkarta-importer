@@ -14,6 +14,14 @@ client.indices.create({
 					year: {
 						type: 'date'
 					},
+					title: {
+						type: 'text',
+						analyzer: 'swedish'
+					},
+					text: {
+						type: 'text',
+						analyzer: 'swedish'
+					},
 					archive: {
 						properties: {
 							page: {
@@ -21,9 +29,44 @@ client.indices.create({
 							}
 						}
 					},
+					type: {
+						type: 'text',
+						analyzer: 'swedish'
+					},
+					taxonomy: {
+						properties: {
+							category: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							name: {
+								type: 'string',
+								index: 'not_analyzed'
+							}
+						}
+					},
 					persons: {
 						type: 'nested',
 						properties: {
+							id: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							name: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							gender: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							relation: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							birth_year: {
+								type: 'date'
+							},
 							home: {
 								properties: {
 									location: {
@@ -85,4 +128,43 @@ client.indices.create({
 	if (err) {
 		console.log(err);
 	}
+
+	client.indices.close({
+		index: 'sagenkarta',
+	}, function() {	
+		client.indices.putSettings({
+			index: 'sagenkarta',
+			body: {
+				"analysis": {
+					"filter": {
+						"swedish_stop": {
+							"type":       "stop",
+							"stopwords":  "_swedish_" 
+						},
+						"swedish_stemmer": {
+							"type":       "stemmer",
+							"language":   "swedish"
+						}
+					},
+					"analyzer": {
+						"swedish": {
+							"tokenizer":  "standard",
+							"filter": [
+								"lowercase",
+								"swedish_stop",
+								"swedish_stemmer"
+							]
+						}
+					}
+				}
+			}
+		}, function(settingsErr) {
+			if (settingsErr) {
+				console.log(settingsErr);
+			}
+			client.indices.open({
+				index: 'sagenkarta'
+			})
+		});
+	})
 });

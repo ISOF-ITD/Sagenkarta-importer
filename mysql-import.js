@@ -34,8 +34,8 @@ function formatCategory(category) {
 	return category.substr(0, 1);
 }
 
-var legendsData = fs.readFileSync('input/records-2017-03-09.json');
-var personsData = fs.readFileSync('input/persons-2017-03-09.json');
+var legendsData = fs.readFileSync(process.argv[3]);
+var personsData = fs.readFileSync(process.argv[2]);
 
 var legends = JSON.parse(legendsData);
 var persons = JSON.parse(personsData);
@@ -90,8 +90,7 @@ var processPerson = function(person) {
 
 		var query = 'INSERT IGNORE INTO persons ('+
 			'id, '+
-			'firstname, '+
-			'surname, '+
+			'name, '+
 			'gender, '+
 			'birth_year, '+
 			'address, '+
@@ -99,8 +98,7 @@ var processPerson = function(person) {
 			'image) '+
 			'VALUES ('+
 				'"'+person.id+'",'+
-				'"'+mysql_real_escape_string(person.firstname)+'",'+
-				'"'+mysql_real_escape_string(person.surname)+'",'+
+				'"'+mysql_real_escape_string(person.firstname+' '+person.surname)+'",'+
 				'"'+(
 					person.gender == 'Man' ? 'm' : (
 						person.gender =='Kvinna' ? 'k' : person.gender
@@ -157,7 +155,7 @@ _.each(legends, function(legend, index) {
 	;
 
 	connection.query(query);
-
+/*
 	if (legend.klintberg_category != '') {
 		query = 'INSERT INTO records_category (record, category, type, level) VALUES ('+
 			id+', '+
@@ -184,7 +182,7 @@ _.each(legends, function(legend, index) {
 		;
 		connection.query(query);
 	}
-
+*/
 	if (collectorIds.length > 0) {
 		_.each(collectorIds, function(collector) {
 			var collectorId = Number(collector.replace(/p|P/, ''));

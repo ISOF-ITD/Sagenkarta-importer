@@ -6,7 +6,7 @@ var currentPage = 0;
 
 var insertChunk = function() {
 	request({
-		url: 'http://localhost/Sagenkarta-API/json_export/'+currentPage+'/1000',
+		url: 'http://localhost/ISOF/Sagenkarta-API/json_export/'+currentPage+'/1000',
 		json: true
 	}, function (error, response, body) {
 		var records = body.data;
@@ -41,6 +41,9 @@ var insertChunk = function() {
 							};
 						}
 					});
+				}
+				if (item.archive.page == 'null') {
+					delete item.archive.page;
 				}
 				bulkBody.push(item);
 			});
