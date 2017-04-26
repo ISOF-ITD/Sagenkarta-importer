@@ -6,7 +6,7 @@ var client = new elasticsearch.Client({
 });
 
 client.indices.create({
-	index: 'sagenkarta',
+	index: process.argv[2] || 'sagenkarta',
 	body: {
 		mappings: {
 			legend: {
@@ -31,7 +31,7 @@ client.indices.create({
 					},
 					type: {
 						type: 'text',
-						analyzer: 'swedish'
+						index: 'not_analyzed'
 					},
 					taxonomy: {
 						properties: {
@@ -56,6 +56,10 @@ client.indices.create({
 								type: 'string',
 								index: 'not_analyzed'
 							},
+							name_analysed: {
+								type: 'string',
+								analyzer: 'swedish'
+							},
 							gender: {
 								type: 'string',
 								index: 'not_analyzed'
@@ -72,11 +76,19 @@ client.indices.create({
 									location: {
 										type: 'geo_point'
 									},
+									id: {
+										type: 'string',
+										index: 'not_analyzed'
+									},
 									name: {
 										type: 'string',
 										index: 'not_analyzed'
 									},
 									harad: {
+										type: 'string',
+										index: 'not_analyzed'
+									},
+									harad_id: {
 										type: 'string',
 										index: 'not_analyzed'
 									},
@@ -110,6 +122,10 @@ client.indices.create({
 								type: 'string',
 								index: 'not_analyzed'
 							},
+							harad_id: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
 							landskap: {
 								type: 'string',
 								index: 'not_analyzed'
@@ -117,6 +133,34 @@ client.indices.create({
 							county: {
 								type: 'string',
 								index: 'not_analyzed'
+							}
+						}
+					},
+					topics: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
+							}
+						}
+					},
+					title_topics: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
 							}
 						}
 					}

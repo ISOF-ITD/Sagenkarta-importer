@@ -17,13 +17,14 @@ var insertChunk = function() {
 			_.each(records, function(item, index) {
 				bulkBody.push({
 					create: {
-						_index: 'sagenkarta',
+						_index: process.argv[2] || 'sagenkarta',
 						_type: 'legend',
 						_id: item.id
 					}
 				});
 				if (item.persons) {
 					_.each(item.persons, function(person) {
+						person.name_analyzed = person.name;
 						if (person.home && person.home.lat && person.home.lng) {
 							person.home.location = {
 								lat: Number(person.home.lat),
