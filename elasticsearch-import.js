@@ -46,6 +46,13 @@ var insertChunk = function() {
 				if (item.archive.page == 'null') {
 					delete item.archive.page;
 				}
+				item.materialtype = item.type;
+				delete item.type;
+
+				if (item.materialtype == 'tryck') {
+					item.materialtype = 'tryckt';
+				}
+
 				bulkBody.push(item);
 			});
 

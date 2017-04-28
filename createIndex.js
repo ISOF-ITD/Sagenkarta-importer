@@ -29,9 +29,9 @@ client.indices.create({
 							}
 						}
 					},
-					type: {
+					materialtype: {
 						type: 'text',
-						index: 'not_analyzed'
+						fielddata: 'true'
 					},
 					taxonomy: {
 						properties: {
