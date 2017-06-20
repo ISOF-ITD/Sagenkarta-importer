@@ -1,8 +1,10 @@
 var _ = require('underscore');
 var elasticsearch = require('elasticsearch');
 
+var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+
 var client = new elasticsearch.Client({
-	host: 'localhost:9200'
+	host: esHost
 });
 
 client.indices.create({
@@ -20,7 +22,8 @@ client.indices.create({
 					},
 					text: {
 						type: 'text',
-						analyzer: 'swedish'
+						analyzer: 'swedish',
+						term_vector: 'with_positions_offsets'
 					},
 					archive: {
 						properties: {
@@ -174,40 +177,48 @@ client.indices.create({
 	}
 
 	client.indices.close({
-		index: 'sagenkarta',
+		index: process.argv[2] || 'sagenkarta',
 	}, function() {	
 		client.indices.putSettings({
-			index: 'sagenkarta',
+			index: process.argv[2] || 'sagenkarta',
 			body: {
+
 				"analysis": {
+
 					"filter": {
 						"swedish_stop": {
-							"type":       "stop",
-							"stopwords":  "_swedish_" 
+							"type": "stop",
+							"stopwords": "_swedish_" 
 						},
 						"swedish_stemmer": {
-							"type":       "stemmer",
-							"language":   "swedish"
+							"type": "stemmer",
+							"language": "swedish"
 						}
 					},
+
 					"analyzer": {
 						"swedish": {
-							"tokenizer":  "standard",
+							"tokenizer": "standard",
 							"filter": [
 								"lowercase",
 								"swedish_stop",
 								"swedish_stemmer"
+							],
+							"char_filter": [
+								"html_strip"
 							]
 						}
 					}
+
 				}
+
 			}
 		}, function(settingsErr) {
 			if (settingsErr) {
 				console.log(settingsErr);
 			}
 			client.indices.open({
-				index: 'sagenkarta'
+				index: process.argv[2] || 'sagenkarta'
 			})
 		});
 	})

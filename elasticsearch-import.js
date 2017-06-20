@@ -4,6 +4,29 @@ var _ = require('underscore');
 
 var currentPage = 0;
 
+var formatGender = function(gender) {
+	if (gender == 'K' ||
+		gender == 'k' ||
+		gender == 'kv' ||
+		gender == 'Kv') {
+		return 'female';
+	}
+	else if (gender == 'Ma' ||
+		gender == 'M' ||
+		gender == 'm' ||
+		gender == 'ma' ||
+		gender == 'Ma') {
+		return 'male'
+	}
+	else {
+		return 'unknown';
+	}
+}
+
+var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+
+// http://www4.sprakochfolkminnen.se/sagner/api/json_export
+
 var insertChunk = function() {
 	request({
 		url: 'http://localhost/ISOF/Sagenkarta-API/json_export/'+currentPage+'/1000',
@@ -31,6 +54,10 @@ var insertChunk = function() {
 								lon: Number(person.home.lng)
 							};
 						}
+						if (person.birth_year && (person.birth_year == 0 || person.birth_year > 1980)) {
+							delete person.birth_year;
+						}
+						person.gender = formatGender(person.gender);
 					});
 				}
 				if (item.places) {
@@ -49,6 +76,10 @@ var insertChunk = function() {
 				item.materialtype = item.type;
 				delete item.type;
 
+				if (item.year && (item.year == 0 || item.year > 1980)) {
+					delete item.year;
+				}
+
 				if (item.materialtype == 'tryck') {
 					item.materialtype = 'tryckt';
 				}
@@ -57,7 +88,7 @@ var insertChunk = function() {
 			});
 
 			var client = new elasticsearch.Client({
-				host: 'localhost:9200',
+				host: esHost,
 				log: 'trace'
 			});
 
