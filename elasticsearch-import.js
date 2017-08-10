@@ -2,6 +2,12 @@ var request = require('request');
 var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
+if (process.argv.length < 5) {
+	console.log('node elasticsearch-import.js [index name] [host] [login]');
+
+	return;
+}
+
 var currentPage = 0;
 
 var formatGender = function(gender) {

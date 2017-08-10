@@ -1,6 +1,12 @@
 var _ = require('underscore');
 var elasticsearch = require('elasticsearch');
 
+if (process.argv.length < 5) {
+	console.log('node createIndex.js [index name] [host] [login]');
+
+	return;
+}
+
 var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
 
 var client = new elasticsearch.Client({
@@ -95,6 +101,10 @@ client.indices.create({
 										type: 'string',
 										index: 'not_analyzed'
 									},
+									lm_id: {
+										type: 'string',
+										fielddata: 'true'
+									},
 									landskap: {
 										type: 'string',
 										index: 'not_analyzed'
@@ -129,6 +139,10 @@ client.indices.create({
 								type: 'string',
 								index: 'not_analyzed'
 							},
+							lm_id: {
+								type: 'string',
+								fielddata: 'true'
+							},
 							landskap: {
 								type: 'string',
 								index: 'not_analyzed'
@@ -153,6 +167,14 @@ client.indices.create({
 							}
 						}
 					},
+					topics_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
+					topics_graph_all: {
+						type: 'text',
+						fielddata: 'true'
+					},
 					title_topics: {
 						type: 'nested',
 						properties: {
@@ -166,6 +188,14 @@ client.indices.create({
 								}
 							}
 						}
+					},
+					title_topics_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
+					title_topics_graph_all: {
+						type: 'text',
+						fielddata: 'true'
 					}
 				}
 			}
