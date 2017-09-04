@@ -53,7 +53,7 @@ var insertChunk = function() {
 				});
 				if (item.persons) {
 					_.each(item.persons, function(person) {
-						person.name_analyzed = person.name;
+						person.name_analysed = person.name;
 						if (person.home && person.home.lat && person.home.lng) {
 							person.home.location = {
 								lat: Number(person.home.lat),
@@ -64,6 +64,40 @@ var insertChunk = function() {
 							delete person.birth_year;
 						}
 						person.gender = formatGender(person.gender);
+					});
+
+					item.persons_graph_flat = _.map(item.persons, function(person) {
+						return person.name;
+					});
+
+					item.persons_graph = _.map(item.persons, function(person) {
+						var home = person.home
+						if (person.home && person.home.lat && person.home.lng) {
+							person.home.location = {
+								lat: Number(person.home.lat),
+								lon: Number(person.home.lng)
+							};
+						}
+
+						return person.name && person.name != '' ? {
+							id: person.id,
+							name: person.name,
+							name_id: person.id+': '+person.name,
+							home_name: person.home && person.home[0] ? person.home[0].name : null,
+							home: person.home ? _.map(person.home, function(home) {
+								return {
+									id: home.id,
+									name: home.name,
+									harad: home.harad,
+									landskap: home.landskap,
+									county: home.county,
+									location: home.lat && home.lng ? {
+										lat: Number(home.lat),
+										lon: Number(home.lng)
+									} : null
+								}
+							}) : []
+						} : null;
 					});
 				}
 				if (item.places) {

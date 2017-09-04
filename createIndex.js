@@ -54,6 +54,57 @@ client.indices.create({
 							}
 						}
 					},
+					persons_graph_flat: {
+						type: 'text',
+						index: 'not_analyzed'
+					},
+					persons_graph: {
+						properties: {
+							id: {
+								type: 'string',
+								fielddata: 'true'
+							},
+							name: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							name_id: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							home_name: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							home: {
+								properties: {
+									location: {
+										type: 'geo_point'
+									},
+									id: {
+										type: 'string',
+										fielddata: 'true'
+									},
+									name: {
+										type: 'string',
+										fielddata: 'true'
+									},
+									harad: {
+										type: 'string',
+										fielddata: 'true'
+									},
+									landskap: {
+										type: 'string',
+										fielddata: 'true'
+									},
+									county: {
+										type: 'string',
+										fielddata: 'true'
+									}
+								}
+							}
+						}
+					},
 					persons: {
 						type: 'nested',
 						properties: {

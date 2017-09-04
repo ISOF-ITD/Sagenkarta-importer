@@ -2,6 +2,12 @@ var fs = require('fs');
 var _ = require('underscore');
 var mysql = require('mysql');
 
+if (process.argv.length < 4) {
+	console.log('node mysql-import.js [persons.json] [records.json]');
+
+	return;
+}
+
 function mysql_real_escape_string (str) {
 	if (typeof str == 'undefined') {
 		return '';
@@ -104,7 +110,7 @@ var processPerson = function(person) {
 						person.gender =='Kvinna' ? 'k' : person.gender
 					)
 				)+'",'+
-				'"'+(Number(person.birth) ? person.birth : '0')+'",'+
+				'"'+(Number(person.birth) ? person.birth : '')+'",'+
 				'"'+mysql_real_escape_string(person.address)+'",'+
 				'"'+mysql_real_escape_string(person.biography)+'",'+
 				'"'+mysql_real_escape_string(person.image)+'"'+
@@ -119,10 +125,9 @@ _.each(persons, processPerson);
 var mediaCounter = 1;
 
 _.each(legends, function(legend, index) {
-	var id = index+1;
+//	var id = index+1;
+	var id = legend.Nummer;
 
-//	var collectorId = Number(legend.PersonId_Uppt.replace(/p|P/, ''));
-//	var informatId = Number(legend.PersonId_Inf.replace(/p|P/, ''));
 	var collectorIds = legend.PersonId_Uppt.split(';');
 	var informatIds = legend.PersonId_Inf.split(';');
 
@@ -142,7 +147,7 @@ _.each(legends, function(legend, index) {
 			'"'+id+'", '+
 			'"'+mysql_real_escape_string(legend.Titel)+'", '+
 			'"'+mysql_real_escape_string(legend.Text)+'", '+
-			'"'+mysql_real_escape_string(formatCategory(legend.category))+'", '+
+			'"'+mysql_real_escape_string(formatCategory(legend.Nyakategorier))+'", '+
 			'"'+mysql_real_escape_string(legend.type.toLowerCase())+'", '+
 			'"'+(legend.year == '' ? 'null' : Number(legend.year))+'", '+
 			'"'+mysql_real_escape_string(legend.Arkiv)+'", '+
@@ -224,7 +229,7 @@ _.each(legends, function(legend, index) {
 		})
 	}
 
-	var sockenIds = legend.Socken_Id.split(';');
+	var sockenIds = legend.SockenId.split(';');
 
 	if (sockenIds.length > 0) {
 		_.each(sockenIds, function(socken) {
