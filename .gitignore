@@ -3,3 +3,5 @@ node_modules
 persons-*.json
 records-*.json
 input
+
+config\.js

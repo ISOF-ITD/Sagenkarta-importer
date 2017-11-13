@@ -2,6 +2,10 @@ var fs = require('fs');
 var _ = require('underscore');
 var mysql = require('mysql');
 
+var config = require('./config');
+
+console.log(config);
+
 if (process.argv.length < 4) {
 	console.log('node matkarta-import.js [matkarta.json] [action]');
 
@@ -25,10 +29,10 @@ if (action == 'records') {
 	var matkartaData = JSON.parse(matkartaFileContent);
 
 	var connection = mysql.createConnection({
-		host: 'localhost',
-		user: 'root',
-		password: '',
-		database: 'svenska_sagor'
+		host: config.host,
+		user: config.user,
+		password: config.password,
+		database: config.database
 	});
 
 	connection.connect();
