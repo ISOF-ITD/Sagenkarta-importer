@@ -3,7 +3,7 @@ var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
 if (process.argv.length < 5) {
-	console.log('node elasticsearch-import.js [index name] [host] [login]');
+	console.log('node elasticsearch-import.js [index name] [host] [login] [type?]');
 
 	return;
 }
@@ -34,11 +34,14 @@ var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.ar
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
 var insertChunk = function() {
+	var recordsUrl = 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(process.argv[5] ? '&type='+process.argv[5] : '');
 	request({
-		url: 'http://localhost/ISOF/Sagenkarta-API/json_export/'+currentPage+'/1000',
+		url: recordsUrl,
 		json: true
 	}, function (error, response, body) {
-		var records = body.data;
+		console.log(recordsUrl);
+
+		var records = body.results;
 
 		if (records.length > 0) {		
 			var bulkBody = [];
@@ -113,8 +116,6 @@ var insertChunk = function() {
 				if (item.archive.page == 'null') {
 					delete item.archive.page;
 				}
-				item.materialtype = item.type;
-				delete item.type;
 
 				if (item.year && (item.year == 0 || item.year > 1980)) {
 					delete item.year;
@@ -135,7 +136,7 @@ var insertChunk = function() {
 			client.bulk({
 				body: bulkBody
 			}, function() {
-				currentPage += 1000;
+				currentPage += 50;
 
 				insertChunk();
 			});

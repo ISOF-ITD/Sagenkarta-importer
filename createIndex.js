@@ -24,7 +24,12 @@ client.indices.create({
 					},
 					title: {
 						type: 'text',
-						analyzer: 'swedish'
+						analyzer: 'swedish',
+						fields: {
+							raw: {
+								type: 'keyword'
+							}
+						}
 					},
 					text: {
 						type: 'text',
@@ -54,57 +59,6 @@ client.indices.create({
 							}
 						}
 					},
-					persons_graph_flat: {
-						type: 'text',
-						index: 'not_analyzed'
-					},
-					persons_graph: {
-						properties: {
-							id: {
-								type: 'string',
-								fielddata: 'true'
-							},
-							name: {
-								type: 'string',
-								index: 'not_analyzed'
-							},
-							name_id: {
-								type: 'string',
-								index: 'not_analyzed'
-							},
-							home_name: {
-								type: 'string',
-								index: 'not_analyzed'
-							},
-							home: {
-								properties: {
-									location: {
-										type: 'geo_point'
-									},
-									id: {
-										type: 'string',
-										fielddata: 'true'
-									},
-									name: {
-										type: 'string',
-										fielddata: 'true'
-									},
-									harad: {
-										type: 'string',
-										fielddata: 'true'
-									},
-									landskap: {
-										type: 'string',
-										fielddata: 'true'
-									},
-									county: {
-										type: 'string',
-										fielddata: 'true'
-									}
-								}
-							}
-						}
-					},
 					persons: {
 						type: 'nested',
 						properties: {
@@ -114,11 +68,12 @@ client.indices.create({
 							},
 							name: {
 								type: 'string',
-								index: 'not_analyzed'
-							},
-							name_analysed: {
-								type: 'string',
-								analyzer: 'swedish'
+								analyzer: 'swedish',
+								fields: {
+									raw: {
+										type: 'keyword'
+									}
+								}
 							},
 							gender: {
 								type: 'string',
@@ -132,6 +87,7 @@ client.indices.create({
 								type: 'date'
 							},
 							home: {
+								type: 'nested',
 								properties: {
 									location: {
 										type: 'geo_point'
