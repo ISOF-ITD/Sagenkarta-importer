@@ -4,8 +4,6 @@ var mysql = require('mysql');
 
 var config = require('./config');
 
-console.log(config);
-
 if (process.argv.length < 4) {
 	console.log('node matkarta-import.js [matkarta.json] [action]');
 
@@ -35,7 +33,14 @@ if (action == 'records') {
 		database: config.database
 	});
 
-	connection.connect();
+	connection.connect(function(err) {
+		if (err) {
+			console.error('error connecting: ' + err.stack);
+			return;
+		}
+
+		console.log('connected as id ' + connection.threadId);
+	});
 
 	var currentItem = 0;
 
@@ -49,6 +54,9 @@ if (action == 'records') {
 			'"sweden", '+
 			'"matkarta")'
 		, function (error, results, fields) {
+			if (error) {
+				console.log(error);
+			}
 			var recordId = results.insertId;
 
 			if (item['Frågelista'] != '' && item['Frågelista'] != 'Nej') {
