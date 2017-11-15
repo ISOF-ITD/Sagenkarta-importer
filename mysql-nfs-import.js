@@ -87,7 +87,7 @@ var processPerson = function(person) {
 					person['Kön'] =='Kvinne' ? 'k' : person['Kön']
 				)
 			)+'",'+
-			'"'+(Number(person['Födelseår']) ? person['Födelseår'] : 'null')+'",'+
+			'"'+(Number(person['Födelseår']) && Number(person['Födelseår']) > 0 ? person['Födelseår'] : 'null')+'",'+
 			'"'+mysql_real_escape_string(person['Födelseort'])+'",'+
 			'"'+mysql_real_escape_string(person.Personalia)+'",'+
 			'"'+mysql_real_escape_string(person.Bild)+'"'+
@@ -103,16 +103,20 @@ var processPerson = function(person) {
 
 _.each(persons, processPerson);
 
+var processText = function(text) {
+	return text.split('\n').join(' ');
+}
+
 _.each(legends, function(legend, index) {
 //	var collectorId = Number(legend.PersonId_Uppt.replace(/p|P/, ''));
 //	var informatId = Number(legend.PersonId_Inf.replace(/p|P/, ''));
+	var categories = legend['Klassificering'].split(';');
 	var collectorIds = legend['PersonId-Uppt'].split(' ').join('').split(',');
 	var informatIds = legend['PersonId-Inf'].split(' ').join('').split(',');
 
 	var query = 'INSERT INTO records ('+
 		'title, '+
 		'text, '+
-		'category, '+
 		'type, '+
 		'year, '+
 		'archive, '+
@@ -122,13 +126,12 @@ _.each(legends, function(legend, index) {
 		'comment, '+
 		'country) VALUES ('+
 			'"'+mysql_real_escape_string(legend.Titel)+'", '+
-			'"'+mysql_real_escape_string(legend.Text)+'", '+
-			'"'+mysql_real_escape_string(legend.Klassificering)+'", '+
+			'"'+mysql_real_escape_string(processText(legend.Text))+'", '+
 			'"'+mysql_real_escape_string(legend.Materialkategori.toLowerCase())+'", '+
-			(legend['Uppteckningsår'] == '' ? 'null' : Number(legend['Uppteckningsår']))+', '+
+			(legend['Uppteckningsår'] == '' ? 'null' : Number(legend['Uppteckningsår']) ? Number(legend['Uppteckningsår']) : 'null')+', '+
 			'"'+mysql_real_escape_string(legend.Arkiv)+'", '+
 			'"'+mysql_real_escape_string(legend['Acc. nr'])+'", '+
-			'"'+(legend['Sid. nr'] > 0 ? legend['Sid. nr'] : 'null')+'", '+
+			(legend['Sid. nr'] > 0 ? '"'+legend['Sid. nr']+'"' : 'null')+', '+
 			'"'+mysql_real_escape_string(legend['Ev. tryckt källa'])+'", '+
 			'"'+mysql_real_escape_string(legend.Kommentar)+'", '+
 			'"norway"'+
@@ -145,9 +148,28 @@ _.each(legends, function(legend, index) {
 
 		var id = result.insertId;
 
+		if (categories.length > 0) {
+			_.each(categories, function(category) {
+				console.log('Insert category relation');
+
+				var query = 'INSERT INTO records_category (record, category) VALUES ('+
+					id+', '+
+					'"'+category+'")'
+				;
+				connection.query(query, function(err) {
+					if (err) {
+						console.log(err);
+						console.log(query);
+					}
+				});
+			})
+		}
+
 		if (collectorIds.length > 0) {
 			_.each(collectorIds, function(collector) {
-				var collectorId = 'n'+collector;
+				console.log('Insert collector relation');
+
+				var collectorId = collector;
 
 				if (collectorId) {
 					legendPersons.push({
@@ -172,6 +194,8 @@ _.each(legends, function(legend, index) {
 
 		if (informatIds.length > 0) {
 			_.each(informatIds, function(informant) {
+				console.log('Insert informant relation');
+
 				var informatId = informant;
 
 				if (informatId) {
@@ -200,6 +224,8 @@ _.each(legends, function(legend, index) {
 
 		if (sockenIds.length > 0) {
 			_.each(sockenIds, function(socken) {
+				console.log('Insert place relation');
+
 				var sockenId = Number(socken)+20000;
 
 				if (sockenId) {		
@@ -222,10 +248,12 @@ _.each(legends, function(legend, index) {
 		}
 
 
-		if (legend.image != '') {
+		if (legend.Bildnr != '') {
 			var images = legend.Bildnr.split(' ').join('').split(';');
 
 			_.each(images, function(image) {
+				console.log('Insert media relation');
+
 				var query = 'INSERT INTO media (source, type) VALUES ('+
 					'"'+image+'", '+
 					'"image")'
