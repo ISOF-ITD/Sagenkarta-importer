@@ -119,17 +119,19 @@ _.each(legends, function(legend, index) {
 		'archive_id, '+
 		'archive_page, '+
 		'source, '+
-		'comment) VALUES ('+
+		'comment, '+
+		'country) VALUES ('+
 			'"'+mysql_real_escape_string(legend.Titel)+'", '+
 			'"'+mysql_real_escape_string(legend.Text)+'", '+
 			'"'+mysql_real_escape_string(legend.Klassificering)+'", '+
 			'"'+mysql_real_escape_string(legend.Materialkategori.toLowerCase())+'", '+
-			'"'+(legend['Uppteckningsår'] == '' ? 'null' : Number(legend['Uppteckningsår']))+'", '+
+			(legend['Uppteckningsår'] == '' ? 'null' : Number(legend['Uppteckningsår']))+', '+
 			'"'+mysql_real_escape_string(legend.Arkiv)+'", '+
 			'"'+mysql_real_escape_string(legend['Acc. nr'])+'", '+
 			'"'+(legend['Sid. nr'] > 0 ? legend['Sid. nr'] : 'null')+'", '+
 			'"'+mysql_real_escape_string(legend['Ev. tryckt källa'])+'", '+
-			'"'+mysql_real_escape_string(legend.Kommentar)+'"'+
+			'"'+mysql_real_escape_string(legend.Kommentar)+'", '+
+			'"norway"'+
 		')'
 	;
 
