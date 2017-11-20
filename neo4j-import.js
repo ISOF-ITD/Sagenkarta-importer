@@ -13,113 +13,13 @@ if (process.argv.length < 3) {
 	return;
 }
 
-function importNodes(fieldName, nodeType) {
-	request({
-		url: apiUrl,
-		json: true
-	}, function (error, response, body) {
-		var index = 0;
-
-		function importMetadata() {
-			var text = body[index];
-
-			console.log(artwork[fieldName]);
-
-			if (!artwork[fieldName] || artwork[fieldName].length == 0) {
-				index++;
-				importMetadata();
-					
-				return;				
-			}
-			_.each(artwork[fieldName], function(item) {
-				if (item == '') {
-					return;
-				}
-
-				var itemName = fieldName == 'persons' ? item.split('"').join('').split('&quot;').join('') : item;
-
-				var createNodeQuery = {
-					query: 'CREATE (a:'+nodeType+' {name: "'+(itemName)+'"}) RETURN a',
-				};
-
-				fetch(cypherUrl, {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(createNodeQuery)
-				}).then(function(response) {
-					if (index < body.length-1) {
-						index++;
-
-						importMetadata();
-					}
-					else {
-						console.log('All done!')
-					}
-				});
-			});
-		}
-
-		importMetadata();
-	});
-}
-
-function importLinks(fieldName, nodeType) {
-	request({
-		url: 'http://cdh-vir-1.it.gu.se:8004/person_relations',
-		json: true
-	}, function (error, response, body) {
-		var index = 0;
-
-		function createLink() {
-			var artwork = body[index];
-
-			console.log(artwork[fieldName]);
-
-			if (!artwork[fieldName] || artwork[fieldName].length == 0) {
-				index++;
-				createLink();
-					
-				return;				
-			}
-			_.each(artwork[fieldName], function(item) {
-				if (item == '') {
-					return;
-				}
-
-				var itemName = fieldName == 'persons' ? item.split('"').join('').split('&quot;').join('') : item;
-
-				var createLinkQuery = {
-					query: 'MATCH (a:Object {id: \''+artwork.id+'\'}), (b:'+nodeType+' {name: \''+itemName+'\'}) CREATE (a)<-[r:SUBJECT_OF]-(b)'
-				};
-
-				fetch(cypherUrl, {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(createLinkQuery)
-				}).then(function(response) {
-					if (index < body.length-1) {
-						index++;
-
-						createLink();
-					}
-					else {
-						console.log('All done!')
-					}
-				});
-			});
-		}
-
-		createLink();
-	});
-}
-
 if (action == 'legends') {
 	var currentPage = 0;
 
 	var insertChunk = function() {
 		console.log('Loading from index '+currentPage);
 		request({
-			url: 'http://www4.sprakochfolkminnen.se/sagner/api/json_export/'+currentPage+'/'+pageSize+'/type/arkiv;tryckt/include_text/false',
+			url: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/documents/?type=arkiv,tryckt&size=100&from='+currentPage,
 			json: true
 		}, function (error, response, body) {
 			if (error) {
@@ -133,14 +33,44 @@ if (action == 'legends') {
 				var legend = body.data[index];
 
 				var createLegendQuery = {
-					query: 'CREATE (a:Text {id: "'+legend.id+'", title: "'+legend.title+'", category: "'+(legend.taxonomy.category || '')+'", type: "'+legend.type+'", year: "'+legend.year+'"}) RETURN a',
+					query: 'CREATE (a:Text {id: "'+legend._source.id+'", title: "'+legend._source.title+'", category: "'+(legend._source.taxonomy ? legend._source.taxonomy.category : '')+'", type: "'+legend._source.materialtype+'", year: "'+legend._source.year+'"}) RETURN a',
 				};
 
-				console.log('Insert Text: "'+legend.title+'" ('+legend.id+')');
+				console.log('Insert Text: "'+legend._source.title+'" ('+legend._source.id+')');
 
 				var places = [];
 
-				_.each(legend.persons, function(person) {
+				if (legend._source.taxonomy) {
+					var createCategoryQuery = {
+						query: 'CREATE (a:Category {id: "'+legend._source.taxonomy.category+'", name: "'+legend._source.taxonomy.name+'"}) RETURN a',
+					};
+
+					fetch(cypherUrl, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(createCategoryQuery)
+					}).then(function() {
+
+					}).catch(function() {
+						
+					});
+				}
+
+				var createTypeQuery = {
+					query: 'CREATE (a:Materialtype {name: "'+legend._source.materialtype+'"}) RETURN a',
+				};
+
+				fetch(cypherUrl, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(createTypeQuery)
+				}).then(function() {
+
+				}).catch(function() {
+					
+				});
+
+				_.each(legend._source.persons, function(person) {
 					console.log('Insert Person: "'+person.name+'" ('+person.id+')');
 
 					var createPersonQuery = {
@@ -157,19 +87,19 @@ if (action == 'legends') {
 
 					});
 
-					if (person.home.id) {
+					if (person.home && person.home.id) {
 						places.push(person.home);
 					}
 				});
 
-				places = _.uniq(_.union(places, legend.places), function(place) {
+				places = _.uniq(_.union(places, legend._source.places), function(place) {
 					return place.id;
 				});
 
 				_.each(places, function(place) {
 					console.log('Insert Place: "'+place.name+'" ('+place.id+')');
 					var createPlaceQuery = {
-						query: 'CREATE (a:Place {id: "'+place.id+'", name: "'+place.name+'", landskap: "'+place.landskap+'", county: "'+place.county+'", lat: "'+place.lat+'", lng: "'+place.lng+'"}) RETURN a',
+						query: 'CREATE (a:Place {id: "'+place.id+'", name: "'+place.name+'", landskap: "'+place.landskap+'", county: "'+place.county+'", lat: "'+place.location.lat+'", lng: "'+place.location.lon+'"}) RETURN a',
 					};
 
 					fetch(cypherUrl, {
@@ -223,7 +153,7 @@ if (action == 'relations') {
 	var insertChunk = function() {
 		console.log('Loading from index '+currentPage);
 		request({
-			url: 'http://www4.sprakochfolkminnen.se/sagner/api/json_export/'+currentPage+'/'+pageSize+'/type/arkiv;tryckt/include_text/false',
+			url: 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/es/documents/?type=arkiv,tryckt&size=100&from='+currentPage,
 			json: true
 		}, function (error, response, body) {
 			if (error) {
@@ -236,13 +166,13 @@ if (action == 'relations') {
 			function importLegendRelations() {
 				var legend = body.data[index];
 
-				console.log('Insert relations to: "'+legend.title+'" ('+legend.id+')');
+				console.log('Insert relations to: "'+legend._source.title+'" ('+legend._source.id+')');
 
-				_.each(legend.persons, function(person) {
-					console.log('Insert relation between "'+legend.title+'" ('+legend.id+') and "'+person.name+'" ('+person.id+')');
+				_.each(legend._source.persons, function(person) {
+					console.log('Insert relation between "'+legend._source.title+'" ('+legend._source.id+') and "'+person.name+'" ('+person.id+')');
 
 					var createRelationQuery = {
-						query: 'MATCH (t:Text {id: "'+legend.id+'"}), (p:Person {id: "'+person.id+'"}) CREATE UNIQUE (t)<-[:'+(person.relation == 'collector' ? 'COLLECTED' : person.relation == 'informant' ? 'TOLD' : 'DEFAULT')+']-(p)'
+						query: 'MATCH (t:Text {id: "'+legend._source.id+'"}), (p:Person {id: "'+person.id+'"}) CREATE UNIQUE (t)<-[:'+(person.relation == 'c' ? 'COLLECTED' : person.relation == 'i' ? 'TOLD' : 'DEFAULT')+']-(p)'
 					};
 
 					fetch(cypherUrl, {
@@ -273,10 +203,10 @@ if (action == 'relations') {
 				});
 
 				_.each(legend.places, function(place) {
-					console.log('Insert relation between "'+legend.title+'" ('+legend.id+') and "'+place.name+'" ('+place.id+')');
+					console.log('Insert relation between "'+legend._source.title+'" ('+legend._source.id+') and "'+place.name+'" ('+place.id+')');
 
 					var createRelationQuery = {
-						query: 'MATCH (t:Text {id: "'+legend.id+'"}), (p:Place {id: "'+place.id+'"}) CREATE UNIQUE (t)-[:COLLECTED_IN]->(p)'
+						query: 'MATCH (t:Text {id: "'+legend._source.id+'"}), (p:Place {id: "'+place.id+'"}) CREATE UNIQUE (t)-[:COLLECTED_IN]->(p)'
 					};
 
 					fetch(cypherUrl, {
@@ -288,6 +218,36 @@ if (action == 'relations') {
 					}).catch(function() {
 
 					});
+				});
+
+				if (legend._source.taxonomy) {
+					var createCategoryRelationQuery = {
+						query: 'MATCH (t:Text {id: "'+legend._source.id+'"}), (c:Category {id: "'+legend._source.taxonomy.category+'"}) CREATE UNIQUE (t)-[:IN_CATEGORY]->(c)'
+					};
+
+					fetch(cypherUrl, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(createCategoryRelationQuery)
+					}).then(function() {
+
+					}).catch(function() {
+
+					});
+				}
+
+				var createTypeRelationQuery = {
+					query: 'MATCH (t:Text {id: "'+legend._source.id+'"}), (m:Materialtype {name: "'+legend._source.materialtype+'"}) CREATE UNIQUE (t)-[:OF_TYPE]->(m)'
+				};
+
+				fetch(cypherUrl, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(createTypeRelationQuery)
+				}).then(function() {
+
+				}).catch(function() {
+
 				});
 
 				if (index < body.data.length-1) {
