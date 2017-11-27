@@ -38,9 +38,15 @@ if (action == 'records') {
 	var importItem = function() {
 		var item = matkartaData[currentItem];
 
-		connection.query('INSERT INTO records (title, year, archive_id, country, type) VALUES ('+
-			'"'+item.Titel_Allt+'", '+
+		var title = item.Titel_Allt;
+		title = title.replace('Frgl. ', '');
+
+		title = title.substr(0, 1).toUpperCase()+title.substr(1);
+
+		connection.query('INSERT INTO records (title, year, archive, archive_id, country, type) VALUES ('+
+			connection.escape(title)+', '+
 			(Boolean(Number(item['UrsprungsårFrån'])) ? item['UrsprungsårFrån'] : 'null')+', '+
+			'"DFU", '+
 			'"'+item['Acc_nr_ny']+'", '+
 			'"sweden", '+
 			'"matkarta")'
@@ -66,7 +72,7 @@ if (action == 'records') {
 			
 			connection.query('INSERT INTO records_media (record, type, source) VALUES ('+recordId+', "pdf", "'+item['media'][0]+'")');
 
-			console.log('Insert: '+item['Titel_Allt']);
+			console.log('Insert: '+title);
 
 			if (matkartaData.length-1 > currentItem) {
 				currentItem++;

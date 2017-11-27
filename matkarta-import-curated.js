@@ -47,9 +47,10 @@ if (action == 'records') {
 	var importItem = function() {
 		var item = matkartaData[currentItem];
 
-		connection.query('INSERT INTO records (title, year, archive_id, country, type) VALUES ('+
-			'"'+item.Titel+'", '+
+		connection.query('INSERT INTO records (title, year, archive, archive_id, country, type) VALUES ('+
+			connection.escape(item.Titel)+', '+
 			(Boolean(Number(item['År'])) ? item['År'] : 'null')+', '+
+			'"'+item['Arkiv']+'", '+
 			'"'+item['Acc.nr.']+'", '+
 			'"sweden", '+
 			'"matkarta")'
