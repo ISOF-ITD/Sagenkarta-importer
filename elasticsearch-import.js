@@ -34,7 +34,7 @@ var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.ar
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(process.argv[5] ? '&'+process.argv[5] : '');
+	var recordsUrl = 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(process.argv[5] ? '&'+process.argv[5] : '');
 	request({
 		url: recordsUrl,
 		json: true
