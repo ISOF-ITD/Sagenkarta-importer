@@ -123,6 +123,10 @@ client.indices.create({
 									county: {
 										type: 'string',
 										index: 'not_analyzed'
+									},
+									type: {
+										type: 'string',
+										index: 'not_analyzed'
 									}
 								}
 							}

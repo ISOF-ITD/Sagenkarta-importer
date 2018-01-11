@@ -3,10 +3,12 @@ var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
 if (process.argv.length < 5) {
-	console.log('node elasticsearch-import.js [index name] [host] [login] [Rest API params?]');
+	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?] --bulk_action=[create|update]');
 
 	return;
 }
+
+var argv = require('minimist')(process.argv.slice(2));
 
 var currentPage = 0;
 
@@ -29,12 +31,12 @@ var formatGender = function(gender) {
 	}
 }
 
-var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+var esHost = 'https://'+(argv.login ? argv.login+'@' : '')+(argv.host || 'localhost:9200');
 
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(process.argv[5] ? '&'+process.argv[5] : '');
+	var recordsUrl = 'http://frigg.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
 		json: true
@@ -47,13 +49,20 @@ var insertChunk = function() {
 			var bulkBody = [];
 
 			_.each(records, function(item, index) {
-				bulkBody.push({
-					create: {
-						_index: process.argv[2] || 'sagenkarta',
-						_type: 'legend',
-						_id: item.id
+				bulkBody.push(argv.bulk_action && argv.bulk_action == 'update' ? {
+						update: {
+							_index: argv.index || 'sagenkarta',
+							_type: 'legend',
+							_id: item.id
+						}
+					} : {
+						create: {
+							_index: argv.index || 'sagenkarta',
+							_type: 'legend',
+							_id: item.id
+						}
 					}
-				});
+				);
 				if (item.persons) {
 					_.each(item.persons, function(person) {
 						person.name_analysed = person.name;
@@ -125,7 +134,9 @@ var insertChunk = function() {
 					item.materialtype = 'tryckt';
 				}
 
-				bulkBody.push(item);
+				bulkBody.push(argv.bulk_action == 'update' ? {
+					doc: item
+				} : item);
 			});
 
 			var client = new elasticsearch.Client({
