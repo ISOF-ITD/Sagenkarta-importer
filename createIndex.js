@@ -19,6 +19,10 @@ client.indices.create({
 		mappings: {
 			legend: {
 				properties: {
+					id: {
+						type: 'text',
+						index: 'not_analyzed'
+					},
 					year: {
 						type: 'date'
 					},

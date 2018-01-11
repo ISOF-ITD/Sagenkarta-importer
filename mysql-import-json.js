@@ -67,7 +67,7 @@ if (action == 'persons') {
 
 if (action == 'records') {
 	_.each(fileData, function(item) {
-		var query = 'INSERT INTO records (id, title, text, year, archive, language, country, archive_id, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(item.title)+', "", '+connection.escape(item.year ? item.year.split('-')[0] : null)+', '+connection.escape(item.archive.archive)+', '+connection.escape('swedish')+', '+connection.escape(item.archive.country)+', '+connection.escape(item.archive.archive_id)+', '+connection.escape(item.materialtype)+')';
+		var query = 'INSERT INTO records (id, title, text, year, archive, language, country, archive_id, total_pages, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(item.title)+', "", '+connection.escape(item.year ? item.year.split('-')[0] : null)+', '+connection.escape(item.archive.archive)+', '+connection.escape('swedish')+', '+connection.escape(item.archive.country)+', '+connection.escape(item.archive.archive_id)+', '+connection.escape(item.archive.total_pages)+', '+connection.escape(item.materialtype)+')';
 
 		connection.query(query, function(error, results, fields) {
 			if (!error) {
