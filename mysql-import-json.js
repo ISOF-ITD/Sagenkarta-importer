@@ -2,6 +2,8 @@ var fs = require('fs');
 var _ = require('underscore');
 var mysql = require('mysql');
 
+var config = require('./config');
+
 if (process.argv.length < 4) {
 	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --category_type=[type]');
 
@@ -13,10 +15,10 @@ var argv = require('minimist')(process.argv.slice(2));
 var action = argv.action;
 
 var connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'svenska_sagor'
+	host: config.host,
+	user: config.user,
+	password: config.password,
+	database: config.database
 });
 
 connection.connect();

@@ -21,7 +21,7 @@ client.indices.create({
 				properties: {
 					id: {
 						type: 'text',
-						index: 'not_analyzed'
+						fielddata: 'true'
 					},
 					year: {
 						type: 'date'
