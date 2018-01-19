@@ -5,7 +5,7 @@ var mysql = require('mysql');
 var config = require('./config');
 
 if (process.argv.length < 4) {
-	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --category_type=[type]');
+	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --categoryType=[type] --recordIdPrefix=[id prefix] --personIdPrefix=[id prefix]');
 
 	return;
 }
@@ -33,7 +33,7 @@ if (action == 'categories') {
 	});
 
 	_.each(categories, function(category) {
-		var query = 'INSERT IGNORE INTO categories_v2 (id, name, type) VALUES ('+connection.escape(category.category)+', '+connection.escape(category.name)+', '+connection.escape(argv.category_type)+')';
+		var query = 'INSERT IGNORE INTO categories_v2 (id, name, type) VALUES ('+connection.escape(category.category)+', '+connection.escape(category.name)+', '+connection.escape(argv.categoryType)+')';
 
 		connection.query(query, function(error, results, fields) {
 			if (!error) {
@@ -44,6 +44,8 @@ if (action == 'categories') {
 }
 
 if (action == 'persons') {
+	console.log('Import persons');
+
 	var formatGender = function(gender) {
 		return gender == 'male' ? 'm' : gender == 'female' ? 'k' : '';
 	}
@@ -56,7 +58,7 @@ if (action == 'persons') {
 
 	_.each(persons, function(person) {
 		if (person) {		
-			var query = 'INSERT IGNORE INTO persons (id, name, gender, birth_year) VALUES ('+connection.escape('acc'+person.id)+', '+connection.escape(person.name)+', '+connection.escape(formatGender(person.gender))+', '+connection.escape(person.birth_year)+')';
+			var query = 'INSERT IGNORE INTO persons (id, name, gender, birth_year) VALUES ('+connection.escape((argv.personIdPrefix || '')+person.id)+', '+connection.escape(person.name)+', '+connection.escape(formatGender(person.gender))+', '+connection.escape(person.birth_year)+')';
 
 			connection.query(query, function(error, results, fields) {
 				if (!error) {
@@ -68,8 +70,11 @@ if (action == 'persons') {
 }
 
 if (action == 'records') {
+	console.log('Import records');
+
 	_.each(fileData, function(item) {
-		var query = 'INSERT INTO records (id, title, text, year, archive, language, country, archive_id, total_pages, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(item.title)+', "", '+connection.escape(item.year ? item.year.split('-')[0] : null)+', '+connection.escape(item.archive.archive)+', '+connection.escape('swedish')+', '+connection.escape(item.archive.country)+', '+connection.escape(item.archive.archive_id)+', '+connection.escape(item.archive.total_pages)+', '+connection.escape(item.materialtype)+')';
+		var query = 'INSERT INTO records (id, title, text, year, archive, language, country, archive_id, total_pages, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(item.title)+', '+connection.escape(item.text)+', '+connection.escape(item.year || null)+', '+connection.escape(item.archive.archive)+', '+connection.escape('swedish')+', '+connection.escape(item.archive.country)+', '+connection.escape(item.archive.archive_id)+', '+connection.escape(item.archive.total_pages || 1)+', '+connection.escape(item.materialtype)+')';
+		console.log(query);
 
 		connection.query(query, function(error, results, fields) {
 			if (!error) {
@@ -78,7 +83,9 @@ if (action == 'records') {
 					_.each(item.taxonomy, function(category) {
 						console.log(category);
 						connection.query('INSERT INTO records_category (record, category) VALUES ('+connection.escape(item.id)+', '+connection.escape(category.category)+')', function(error1, results, fields) {
-							console.log(error1);
+							if (error1) {
+								console.log(error1);
+							}
 						});
 					});
 				}
@@ -86,8 +93,10 @@ if (action == 'records') {
 				if (item.persons) {
 					_.each(item.persons, function(person) {
 						console.log(person);
-						connection.query('INSERT INTO records_persons (record, person, relation) VALUES ('+connection.escape(item.id)+', '+connection.escape('acc'+person.id)+', '+connection.escape(person.relation)+')', function(error2, results, fields) {
-							console.log(error2);
+						connection.query('INSERT INTO records_persons (record, person, relation) VALUES ('+connection.escape(item.id)+', '+connection.escape((argv.personIdPrefix || '')+person.id)+', '+connection.escape(person.relation)+')', function(error2, results, fields) {
+							if (error2) {
+								console.log(error2);
+							}
 						});
 					});
 				}
@@ -96,7 +105,20 @@ if (action == 'records') {
 					_.each(item.places, function(place) {
 						console.log(place);
 						connection.query('INSERT INTO records_places (record, place, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(place.id)+', '+connection.escape(place.type)+')', function(error3, results, fields) {
-							console.log(error3);
+							if (error3) {
+								console.log(error3);
+							}
+						});
+					});
+				}
+
+				if (item.metadata) {
+					_.each(item.metadata, function(metadataItem) {
+						console.log(metadataItem);
+						connection.query('INSERT INTO records_metadata (record, type, value) VALUES ('+connection.escape(item.id)+', '+connection.escape(metadataItem.type)+', '+connection.escape(metadataItem.value)+')', function(error4, results, fields) {
+							if (error4) {
+								console.log(error4);
+							}
 						});
 					});
 				}
