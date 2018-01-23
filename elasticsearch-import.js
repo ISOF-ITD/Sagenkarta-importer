@@ -72,7 +72,7 @@ var insertChunk = function() {
 								lon: Number(person.home.lng)
 							};
 						}
-						if (person.birth_year && (person.birth_year == 0 || person.birth_year > 1980)) {
+						if (person.birth_year && (person.birth_year == 0 || person.birth_year > 2018)) {
 							delete person.birth_year;
 						}
 						person.gender = formatGender(person.gender);
@@ -124,10 +124,6 @@ var insertChunk = function() {
 				}
 				if (item.archive.page == 'null') {
 					delete item.archive.page;
-				}
-
-				if (item.year && (item.year == 0 || item.year > 1980)) {
-					delete item.year;
 				}
 
 				if (item.materialtype == 'tryck') {
