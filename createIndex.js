@@ -18,7 +18,113 @@ client.indices.create({
 	body: {
 		mappings: {
 			legend: {
+/*
+				dynamic_templates: [
+					{
+						topics: {
+							match: '*topics*',
+							unmatch: '*_graph',
+							mapping: {
+								type: 'nested',
+								properties: {
+									terms: {
+										type: 'nested',
+										properties: {
+											term: {
+												type: 'string',
+												index: 'not_analyzed'
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					{
+						graph: {
+							match: '*_graph',
+							unmatch: '*persons*',
+							mapping: {
+								type: 'text',
+								fielddata: 'true'
+							}
+						}
+					}
+				],
+*/
 				properties: {
+					topics_10_10: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
+							}
+						}
+					},
+					title_topics_10_10: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
+							}
+						}
+					},
+					topics_2_5: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
+							}
+						}
+					},
+					title_topics_2_5: {
+						type: 'nested',
+						properties: {
+							terms: {
+								type: 'nested',
+								properties: {
+									term: {
+										type: 'string',
+										index: 'not_analyzed'
+									}
+								}
+							}
+						}
+					},
+					topics_10_10_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
+					title_topics_10_10_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
+					topics_2_5_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
+					title_topics_2_5_graph: {
+						type: 'text',
+						fielddata: 'true'
+					},
 					id: {
 						type: 'text',
 						fielddata: 'true'
@@ -38,7 +144,13 @@ client.indices.create({
 					text: {
 						type: 'text',
 						analyzer: 'swedish',
-						term_vector: 'with_positions_offsets'
+						term_vector: 'with_positions_offsets',
+						fields: {
+							raw: {
+								type: 'text',
+								index: 'not_analyzed'
+							}
+						}
 					},
 					archive: {
 						properties: {
@@ -58,6 +170,10 @@ client.indices.create({
 								index: 'not_analyzed'
 							},
 							name: {
+								type: 'string',
+								index: 'not_analyzed'
+							},
+							type: {
 								type: 'string',
 								index: 'not_analyzed'
 							}
@@ -167,50 +283,6 @@ client.indices.create({
 								index: 'not_analyzed'
 							}
 						}
-					},
-					topics: {
-						type: 'nested',
-						properties: {
-							terms: {
-								type: 'nested',
-								properties: {
-									term: {
-										type: 'string',
-										index: 'not_analyzed'
-									}
-								}
-							}
-						}
-					},
-					topics_graph: {
-						type: 'text',
-						fielddata: 'true'
-					},
-					topics_graph_all: {
-						type: 'text',
-						fielddata: 'true'
-					},
-					title_topics: {
-						type: 'nested',
-						properties: {
-							terms: {
-								type: 'nested',
-								properties: {
-									term: {
-										type: 'string',
-										index: 'not_analyzed'
-									}
-								}
-							}
-						}
-					},
-					title_topics_graph: {
-						type: 'text',
-						fielddata: 'true'
-					},
-					title_topics_graph_all: {
-						type: 'text',
-						fielddata: 'true'
 					}
 				}
 			}
@@ -223,7 +295,7 @@ client.indices.create({
 
 	client.indices.close({
 		index: process.argv[2] || 'sagenkarta',
-	}, function() {	
+	}, function() {
 		client.indices.putSettings({
 			index: process.argv[2] || 'sagenkarta',
 			body: {
@@ -233,7 +305,7 @@ client.indices.create({
 					"filter": {
 						"swedish_stop": {
 							"type": "stop",
-							"stopwords": "_swedish_" 
+							"stopwords": "_swedish_"
 						},
 						"swedish_stemmer": {
 							"type": "stemmer",

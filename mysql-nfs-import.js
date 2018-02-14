@@ -4,11 +4,13 @@ var mysql = require('mysql');
 
 var config = require('./config');
 
-if (process.argv.length < 4) {
-	console.log('node mysql-nfs-import.js [persons data file] [legends data file]');
+if (process.argv.length < 6) {
+	console.log('node mysql-nfs-import.js [persons data file] [legends data file] --action=[persons|records] --startId=[start id] --idPrefix=[id prefix]');
 
 	return;
 }
+
+var argv = require('minimist')(process.argv.slice(2));
 
 function mysql_real_escape_string (str) {
 	if (typeof str == 'undefined') {
@@ -101,187 +103,193 @@ var processPerson = function(person) {
 	});
 };
 
-_.each(persons, processPerson);
-
-var processText = function(text) {
-	return text.split('\n').join(' ');
+var formatText = function(text) {
+//	return text;
+	return text.split('\n').join('<br/>');
 }
 
-_.each(legends, function(legend, index) {
-//	var collectorId = Number(legend.PersonId_Uppt.replace(/p|P/, ''));
-//	var informatId = Number(legend.PersonId_Inf.replace(/p|P/, ''));
-	var categories = legend['Klassificering'].split(';');
-	var collectorIds = legend['PersonId-Uppt'].split(' ').join('').split(',');
-	var informatIds = legend['PersonId-Inf'].split(' ').join('').split(',');
+var currentId = argv.startId;
 
-	var query = 'INSERT INTO records ('+
-		'title, '+
-		'text, '+
-		'type, '+
-		'year, '+
-		'archive, '+
-		'archive_id, '+
-		'archive_page, '+
-		'source, '+
-		'comment, '+
-		'country) VALUES ('+
-			'"'+mysql_real_escape_string(legend.Titel)+'", '+
-			'"'+mysql_real_escape_string(processText(legend.Text))+'", '+
-			'"'+mysql_real_escape_string(legend.Materialkategori.toLowerCase())+'", '+
-			(legend['Uppteckningsår'] == '' ? 'null' : Number(legend['Uppteckningsår']) ? Number(legend['Uppteckningsår']) : 'null')+', '+
-			'"'+mysql_real_escape_string(legend.Arkiv)+'", '+
-			'"'+mysql_real_escape_string(legend['Acc. nr'])+'", '+
-			(legend['Sid. nr'] > 0 ? '"'+legend['Sid. nr']+'"' : 'null')+', '+
-			'"'+mysql_real_escape_string(legend['Ev. tryckt källa'])+'", '+
-			'"'+mysql_real_escape_string(legend.Kommentar)+'", '+
-			'"norway"'+
-		')'
-	;
+if (argv.action == 'persons') {
+	_.each(persons, processPerson);
+}
+else if (argv.action == 'records') {
+	_.each(legends, function(legend, index) {
+	//	var collectorId = Number(legend.PersonId_Uppt.replace(/p|P/, ''));
+	//	var informatId = Number(legend.PersonId_Inf.replace(/p|P/, ''));
+		var categories = legend['Klassificering'].split(';');
+		var collectorIds = legend['PersonId-Uppt'].split(' ').join('').split(',');
+		var informatIds = legend['PersonId-Inf'].split(' ').join('').split(',');
+		var images = legend['Bildnr'].split(' ').join('').split(';');
 
-	connection.query(query, function(recordInsertErr, result) {
-		if (recordInsertErr) {
-			console.log(recordInsertErr);
-			console.log(query);
+		var recordId = ((argv.idPrefix || '')+currentId);
 
-			return;
-		}
+		var year = legend['Uppteckningsår'] == '' ? 'null' :
+			Number(legend['Uppteckningsår']) ? '"'+(legend['Uppteckningsår'])+'-01-01"' :
+			legend['Uppteckningsår'].indexOf('-') > -1 && Number(legend['Uppteckningsår'].split('-')[0]) ? '"'+legend['Uppteckningsår'].split('-')[0]+'-01-01"' :
+			'null';
 
-		var id = result.insertId;
+		var query = 'INSERT INTO records ('+
+			'id, '+
+			'title, '+
+			'text, '+
+			'type, '+
+			'year, '+
+			'archive, '+
+			'archive_id, '+
+			'archive_page, '+
+			'source, '+
+			'comment, '+
+			'country) VALUES ('+
+				'"'+recordId+'", '+
+				'"'+mysql_real_escape_string(legend.Titel)+'", '+
+				'"'+mysql_real_escape_string(formatText(legend.Text))+'", '+
+				'"'+mysql_real_escape_string(legend.Materialkategori.toLowerCase())+'", '+
+				year+', '+
+				'"'+mysql_real_escape_string(legend.Arkiv)+'", '+
+				'"'+mysql_real_escape_string(legend['Acc. nr'])+'", '+
+				(legend['Sid. nr'] > 0 ? '"'+legend['Sid. nr']+'"' : 'null')+', '+
+				'"'+mysql_real_escape_string(legend['Ev. tryckt källa'])+'", '+
+				'"'+mysql_real_escape_string(legend.Kommentar)+'", '+
+				'"norway"'+
+			')'
+		;
 
-		if (categories.length > 0) {
-			_.each(categories, function(category) {
-				console.log('Insert category relation');
+		connection.query(query, function(recordInsertErr, result) {
+			if (recordInsertErr) {
+				console.log(recordInsertErr);
+				console.log(query);
 
-				var query = 'INSERT INTO records_category (record, category) VALUES ('+
-					id+', '+
-					'"'+category+'")'
-				;
-				connection.query(query, function(err) {
-					if (err) {
-						console.log(err);
-						console.log(query);
+				return;
+			}
+
+			var id = result.insertId;
+
+			if (categories.length > 0) {
+				_.each(categories, function(category) {
+					console.log('Insert category relation');
+
+					var query = 'INSERT INTO records_category (record, category) VALUES ('+
+						'"'+recordId+'", '+
+						'"'+category+'")'
+					;
+					connection.query(query, function(err) {
+						if (err) {
+							console.log(err);
+							console.log(query);
+						}
+					});
+				})
+			}
+
+			if (collectorIds.length > 0) {
+				_.each(collectorIds, function(collector) {
+					console.log('Insert collector relation');
+
+					var collectorId = collector;
+
+					if (collectorId) {
+						legendPersons.push({
+							legend: recordId,
+							person: collectorId,
+							relation: 'c'
+						});
+						var query = 'INSERT INTO records_persons (record, person, relation) VALUES ('+
+							'"'+recordId+'", '+
+							'"'+collectorId+'", '+
+							'"c")'
+						;
+						connection.query(query, function(err) {
+							if (err) {
+								console.log(err);
+								console.log(query);
+							}
+						});
 					}
-				});
-			})
-		}
+				})
+			}
 
-		if (collectorIds.length > 0) {
-			_.each(collectorIds, function(collector) {
-				console.log('Insert collector relation');
+			if (informatIds.length > 0) {
+				_.each(informatIds, function(informant) {
+					console.log('Insert informant relation');
 
-				var collectorId = collector;
+					var informatId = informant;
 
-				if (collectorId) {
-					legendPersons.push({
-						legend: id,
-						person: collectorId,
-						relation: 'c'
-					});
-					var query = 'INSERT INTO records_persons (record, person, relation) VALUES ('+
-						id+', '+
-						'"'+collectorId+'", '+
-						'"c")'
-					;
-					connection.query(query, function(err) {
-						if (err) {
-							console.log(err);
-							console.log(query);
-						}
-					});
-				}
-			})
-		}
+					if (informatId) {
+						legendPersons.push({
+							legend: recordId,
+							person: informatId,
+							relation: 'i'
+						});
+						var query = 'INSERT INTO records_persons (record, person, relation) VALUES ('+
+							'"'+recordId+'", '+
+							'"'+informatId+'", '+
+							'"i")'
+						;
+						connection.query(query, function(err) {
+							if (err) {
+								console.log(err);
+								console.log(query);
+							}
+						});
 
-		if (informatIds.length > 0) {
-			_.each(informatIds, function(informant) {
-				console.log('Insert informant relation');
-
-				var informatId = informant;
-
-				if (informatId) {
-					legendPersons.push({
-						legend: id,
-						person: informatId,
-						relation: 'i'
-					});
-					var query = 'INSERT INTO records_persons (record, person, relation) VALUES ('+
-						id+', '+
-						'"'+informatId+'", '+
-						'"i")'
-					;
-					connection.query(query, function(err) {
-						if (err) {
-							console.log(err);
-							console.log(query);
-						}
-					});
-
-				}
-			})
-		}
-
-		var sockenIds = legend.StedsID.split(',');
-
-		if (sockenIds.length > 0) {
-			_.each(sockenIds, function(socken) {
-				console.log('Insert place relation');
-
-				var sockenId = Number(socken)+20000;
-
-				if (sockenId) {		
-					legendPlaces.push({
-						legend: id,
-						place: sockenId
-					});
-					var query = 'INSERT INTO records_places (record, place) VALUES ('+
-						id+', '+
-						sockenId+')'
-					;
-					connection.query(query, function(err) {
-						if (err) {
-							console.log(err);
-							console.log(query);
-						}
-					});
-				}
-			})
-		}
-
-
-		if (legend.Bildnr != '') {
-			var images = legend.Bildnr.split(' ').join('').split(';');
-
-			_.each(images, function(image) {
-				console.log('Insert media relation');
-
-				var query = 'INSERT INTO media (source, type) VALUES ('+
-					'"'+image+'", '+
-					'"image")'
-				;
-				connection.query(query, function(err, mediaQueryResult) {
-					if (err) {
-						console.log(err);
-						console.log(query);
-
-						return;
 					}
+				})
+			}
 
-					var mediaId = mediaQueryResult.insertId;
+			var sockenIds = legend.StedsID.split(',');
 
-					var query = 'INSERT INTO records_media (record, media) VALUES ('+
-						id+', '+
-						mediaId+')'
+			if (sockenIds.length > 0) {
+				_.each(sockenIds, function(socken) {
+					console.log('Insert place relation');
+
+					var sockenId = Number(socken)+20000;
+
+					if (sockenId) {
+						legendPlaces.push({
+							legend: recordId,
+							place: sockenId
+						});
+						var query = 'INSERT INTO records_places (record, place) VALUES ('+
+							'"'+recordId+'", '+
+							sockenId+')'
+						;
+						connection.query(query, function(err) {
+							if (err) {
+								console.log(err);
+								console.log(query);
+							}
+						});
+					}
+				})
+			}
+
+
+			if (legend.Bildnr != '') {
+				var images = legend.Bildnr.split(' ').join('').split(';');
+
+				_.each(images, function(image) {
+					console.log('Insert media relation');
+
+					var query = 'INSERT INTO records_media (record, source, type) VALUES ('+
+						'"'+recordId+'", '+
+						'"'+'nfs/'+image+'", '+
+						'"image")'
 					;
-					connection.query(query, function(err) {
+					connection.query(query, function(err, mediaQueryResult) {
 						if (err) {
 							console.log(err);
 							console.log(query);
+
+							return;
 						}
 					});
 				});
-			});
-		}
+			}
 
-		console.log('insertId: '+id);
+			console.log('insertId: '+recordId);
+		});
+
+		currentId++;
 	});
-});
+}

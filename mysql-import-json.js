@@ -5,7 +5,7 @@ var mysql = require('mysql');
 var config = require('./config');
 
 if (process.argv.length < 4) {
-	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --categoryType=[type] --recordIdPrefix=[id prefix] --personIdPrefix=[id prefix]');
+	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --categoryType=[type] --recordIdPrefix=[id prefix] --personIdPrefix=[id prefix] --limit=[limit import to x rows]');
 
 	return;
 }
@@ -24,6 +24,10 @@ var connection = mysql.createConnection({
 connection.connect();
 
 var fileData = JSON.parse(fs.readFileSync(process.argv[2]));
+
+if (argv.limit && Number(argv.limit)) {
+	fileData = fileData.slice(0, argv.limit);
+}
 
 if (action == 'categories') {
 	var categories = _.uniq(_.flatten(_.map(fileData, function(item) {
@@ -118,6 +122,17 @@ if (action == 'records') {
 						connection.query('INSERT INTO records_metadata (record, type, value) VALUES ('+connection.escape(item.id)+', '+connection.escape(metadataItem.type)+', '+connection.escape(metadataItem.value)+')', function(error4, results, fields) {
 							if (error4) {
 								console.log(error4);
+							}
+						});
+					});
+				}
+
+				if (item.media) {
+					_.each(item.media, function(mediaItem) {
+						console.log(mediaItem);
+						connection.query('INSERT INTO records_media (record, type, source, title) VALUES ('+connection.escape(item.id)+', '+connection.escape(mediaItem.type)+', '+connection.escape(mediaItem.source)+', '+connection.escape(mediaItem.title)+')', function(error5, results, fields) {
+							if (error5) {
+								console.log(error5);
 							}
 						});
 					});
