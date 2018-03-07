@@ -1,13 +1,13 @@
 var _ = require('underscore');
 var elasticsearch = require('elasticsearch');
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
 	console.log('node createIndex.js [index name] [host] [login]');
 
 	return;
 }
 
-var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+var esHost = (process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
 
 var client = new elasticsearch.Client({
 	host: esHost

@@ -3,5 +3,6 @@ node_modules
 persons-*.json
 records-*.json
 input
+nohup.out
 
 config\.js

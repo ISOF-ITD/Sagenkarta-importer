@@ -31,7 +31,7 @@ var formatGender = function(gender) {
 	}
 }
 
-var esHost = 'https://'+(argv.login ? argv.login+'@' : '')+(argv.host || 'localhost:9200');
+var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
