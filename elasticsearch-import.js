@@ -2,7 +2,7 @@ var request = require('request');
 var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
 	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?] --bulk_action=[create|update]');
 
 	return;
