@@ -5,7 +5,7 @@ var mysql = require('mysql');
 var config = require('./config');
 
 if (process.argv.length < 4) {
-	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --categoryType=[type] --recordIdPrefix=[id prefix] --personIdPrefix=[id prefix] --limit=[limit import to x rows]');
+	console.log('node mysql-import.js [json file] --action=[categories|persons|records] --categoryType=[type] --recordIdPrefix=[id prefix] --personIdPrefix=[id prefix] --limit=[limit import to x rows] --updatePersonsIfDuplicate=[yes|no] --ignoreRecordsInsertError=[yes|no]');
 
 	return;
 }
@@ -61,12 +61,29 @@ if (action == 'persons') {
 	});
 
 	_.each(persons, function(person) {
-		if (person) {		
-			var query = 'INSERT IGNORE INTO persons (id, name, gender, birth_year) VALUES ('+connection.escape((argv.personIdPrefix || '')+person.id)+', '+connection.escape(person.name)+', '+connection.escape(formatGender(person.gender))+', '+connection.escape(person.birth_year)+')';
+		if (person) {
+			if (argv.updatePersonsIfDuplicate == 'yes') {
+				var query = 'INSERT INTO persons (id, name, gender, birth_year) VALUES ('+
+					connection.escape((argv.personIdPrefix || '')+person.id)+', '+
+					connection.escape(person.name)+', '+
+					connection.escape(formatGender(person.gender))+', '+
+					(person.birth_year ? (person.birth_year.indexOf('-') > -1 ? person.birth_year.split('-')[0] : Number(person.birth_year) ? person.birth_year : null) : null)+
+				') ON DUPLICATE KEY UPDATE name = '+
+					connection.escape(person.name)+
+					', gender = '+connection.escape(formatGender(person.gender))+
+					', birth_year = '+(person.birth_year ? (person.birth_year.indexOf('-') > -1 ? person.birth_year.split('-')[0] : Number(person.birth_year) ? person.birth_year : null) : null);
+			}
+			else {
+				var query = 'INSERT IGNORE INTO persons (id, name, gender, birth_year) VALUES ('+connection.escape((argv.personIdPrefix || '')+person.id)+', '+connection.escape(person.name)+', '+connection.escape(formatGender(person.gender))+', '+(person.birth_year ? (person.birth_year.indexOf('-') > -1 ? person.birth_year.split('-')[0] : Number(person.birth_year) ? person.birth_year : null) : null)+')';
+			}
 
 			connection.query(query, function(error, results, fields) {
 				if (!error) {
 					console.log(query);
+				}
+				else {
+					console.log(error);
+					console.log('Error query: '+query);
 				}
 			});
 		}
@@ -80,11 +97,11 @@ if (action == 'records') {
 		var query = 'INSERT INTO records (id, title, text, year, archive, language, country, archive_id, total_pages, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(item.title)+', '+connection.escape(item.text)+', '+connection.escape(item.year || null)+', '+connection.escape(item.archive.archive)+', '+connection.escape('swedish')+', '+connection.escape(item.archive.country)+', '+connection.escape(item.archive.archive_id)+', '+connection.escape(item.archive.total_pages || 1)+', '+connection.escape(item.materialtype)+')';
 
 		connection.query(query, function(error, results, fields) {
-			if (error) {
+			if (error && argv.ignoreRecordsInsertError != 'yes') {
 				console.log(query);
 				console.log(error);
 			}
-			else {
+			if (!error || argv.ignoreRecordsInsertError == 'yes') {
 				console.log('INSERT successful');
 
 				if (item.taxonomy) {
@@ -115,7 +132,7 @@ if (action == 'records') {
 
 				if (item.places) {
 					_.each(item.places, function(place) {
-						var recordsPlacesQuery = 'INSERT INTO records_places (record, place, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(place.id)+', '+connection.escape(place.type)+')';
+						var recordsPlacesQuery = 'INSERT INTO records_places (record, place, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(place.id)+', '+(place.type ? connection.escape(place.type) : connection.escape('place_collected'))+')';
 						connection.query(recordsPlacesQuery, function(error3, results, fields) {
 							if (error3) {
 								console.log(recordsPlacesQuery);

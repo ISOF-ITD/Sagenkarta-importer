@@ -16,6 +16,7 @@ var formatGender = function(gender) {
 	if (gender == 'K' ||
 		gender == 'k' ||
 		gender == 'kv' ||
+		gender == 'female' ||
 		gender == 'Kv') {
 		return 'female';
 	}
@@ -23,6 +24,7 @@ var formatGender = function(gender) {
 		gender == 'M' ||
 		gender == 'm' ||
 		gender == 'ma' ||
+		gender == 'male' ||
 		gender == 'Ma') {
 		return 'male'
 	}
