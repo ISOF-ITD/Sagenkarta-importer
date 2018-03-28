@@ -7,6 +7,8 @@ if (process.argv.length < 4) {
 	return;
 }
 
+var argv = require('minimist')(process.argv.slice(2));
+
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 var client = new elasticsearch.Client({
