@@ -181,6 +181,7 @@ client.indices.create({
 					},
 					persons: {
 						type: 'nested',
+						include_in_root: true,
 						properties: {
 							id: {
 								type: 'string',
@@ -193,7 +194,8 @@ client.indices.create({
 									raw: {
 										type: 'keyword'
 									}
-								}
+								},
+								copy_to: 'search_other'
 							},
 							gender: {
 								type: 'string',
@@ -208,6 +210,7 @@ client.indices.create({
 							},
 							home: {
 								type: 'nested',
+								include_in_root: true,
 								properties: {
 									location: {
 										type: 'geo_point'
@@ -218,11 +221,13 @@ client.indices.create({
 									},
 									name: {
 										type: 'string',
-										index: 'not_analyzed'
+										index: 'not_analyzed',
+										copy_to: 'search_other'
 									},
 									harad: {
 										type: 'string',
-										index: 'not_analyzed'
+										index: 'not_analyzed',
+										copy_to: 'search_other'
 									},
 									harad_id: {
 										type: 'string',
@@ -234,11 +239,13 @@ client.indices.create({
 									},
 									landskap: {
 										type: 'string',
-										index: 'not_analyzed'
+										index: 'not_analyzed',
+										copy_to: 'search_other'
 									},
 									county: {
 										type: 'string',
-										index: 'not_analyzed'
+										index: 'not_analyzed',
+										copy_to: 'search_other'
 									},
 									type: {
 										type: 'string',
@@ -260,11 +267,13 @@ client.indices.create({
 							},
 							name: {
 								type: 'string',
-								index: 'not_analyzed'
+								index: 'not_analyzed',
+								copy_to: 'search_other'
 							},
 							harad: {
 								type: 'string',
-								index: 'not_analyzed'
+								index: 'not_analyzed',
+								copy_to: 'search_other'
 							},
 							harad_id: {
 								type: 'string',
@@ -276,11 +285,13 @@ client.indices.create({
 							},
 							landskap: {
 								type: 'string',
-								index: 'not_analyzed'
+								index: 'not_analyzed',
+								copy_to: 'search_other'
 							},
 							county: {
 								type: 'string',
-								index: 'not_analyzed'
+								index: 'not_analyzed',
+								copy_to: 'search_other'
 							}
 						}
 					}
