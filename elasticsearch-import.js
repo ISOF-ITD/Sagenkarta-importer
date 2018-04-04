@@ -137,10 +137,20 @@ var insertChunk = function() {
 				} : item);
 			});
 
-			var client = new elasticsearch.Client({
+			var options = {
 				host: esHost,
 				log: 'trace'
-			});
+			};
+
+			if (argv.cacert) {
+			        options.ssl = {
+			                ca: fs.readFileSync(argv.cacert),
+        			        rejectUnauthorized: true
+        			};
+			}
+
+
+			var client = new elasticsearch.Client(options);
 
 			client.bulk({
 				body: bulkBody

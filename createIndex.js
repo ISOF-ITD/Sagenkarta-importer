@@ -1,8 +1,9 @@
 var _ = require('underscore');
+var fs = require('fs');
 var elasticsearch = require('elasticsearch');
 
 if (process.argv.length < 4) {
-	console.log('node createIndex.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name]');
+	console.log('node createIndex.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --cacert=[file path]');
 
 	return;
 }
@@ -11,9 +12,18 @@ var argv = require('minimist')(process.argv.slice(2));
 
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
-var client = new elasticsearch.Client({
+var options = {
 	host: esHost
-});
+};
+
+if (argv.cacert) {
+	options.ssl = {
+		ca: fs.readFileSync(argv.cacert),
+		rejectUnauthorized: true
+	};
+}
+
+var client = new elasticsearch.Client(options);
 
 client.indices.create({
 	index: process.argv[2] || 'sagenkarta',
