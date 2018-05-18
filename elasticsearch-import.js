@@ -143,10 +143,10 @@ var insertChunk = function() {
 			};
 
 			if (argv.cacert) {
-			        options.ssl = {
-			                ca: fs.readFileSync(argv.cacert),
-        			        rejectUnauthorized: true
-        			};
+				options.ssl = {
+					ca: fs.readFileSync(argv.cacert),
+					rejectUnauthorized: true
+				};
 			}
 
 

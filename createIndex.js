@@ -271,7 +271,11 @@ client.indices.create({
 								type: 'string',
 								index: 'not_analyzed',
 								copy_to: 'search_other'
-							}
+							},
+							type: {
+								type: 'string',
+								fielddata: 'true'
+							},
 						}
 					}
 				}
