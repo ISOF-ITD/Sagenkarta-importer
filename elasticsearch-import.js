@@ -1,6 +1,7 @@
 var request = require('request');
 var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
+var fs = require('fs');
 
 if (process.argv.length < 4) {
 	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?] --bulk_action=[create|update]');
@@ -154,7 +155,10 @@ var insertChunk = function() {
 
 			client.bulk({
 				body: bulkBody
-			}, function() {
+			}, function(error) {
+				if (error) {
+					console.log(error);
+				}
 				currentPage += 50;
 
 				insertChunk();
