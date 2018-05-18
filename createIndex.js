@@ -26,7 +26,7 @@ if (argv.cacert) {
 var client = new elasticsearch.Client(options);
 
 client.indices.create({
-	index: process.argv[2] || 'sagenkarta',
+	index: argv.index || 'sagenkarta',
 	body: {
 		mappings: {
 			legend: {
@@ -288,10 +288,10 @@ client.indices.create({
 	}
 
 	client.indices.close({
-		index: process.argv[2] || 'sagenkarta',
+		index: argv.index || 'sagenkarta',
 	}, function() {
 		client.indices.putSettings({
-			index: process.argv[2] || 'sagenkarta',
+			index: argv.index || 'sagenkarta',
 			body: {
 
 				"analysis": {
@@ -329,7 +329,7 @@ client.indices.create({
 				console.log(settingsErr);
 			}
 			client.indices.open({
-				index: process.argv[2] || 'sagenkarta'
+				index: argv.index || 'sagenkarta'
 			})
 		});
 	})
