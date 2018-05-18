@@ -4,5 +4,6 @@ persons-*.json
 records-*.json
 input
 nohup.out
+config.js
 
 config\.js

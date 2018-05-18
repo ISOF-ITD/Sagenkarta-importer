@@ -30,40 +30,7 @@ client.indices.create({
 	body: {
 		mappings: {
 			legend: {
-/*
-				dynamic_templates: [
-					{
-						topics: {
-							match: '*topics*',
-							unmatch: '*_graph',
-							mapping: {
-								type: 'nested',
-								properties: {
-									terms: {
-										type: 'nested',
-										properties: {
-											term: {
-												type: 'string',
-												index: 'not_analyzed'
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					{
-						graph: {
-							match: '*_graph',
-							unmatch: '*persons*',
-							mapping: {
-								type: 'text',
-								fielddata: 'true'
-							}
-						}
-					}
-				],
-*/
+				
 				properties: {
 					topics_10_10: {
 						type: 'nested',
@@ -304,7 +271,11 @@ client.indices.create({
 								type: 'string',
 								index: 'not_analyzed',
 								copy_to: 'search_other'
-							}
+							},
+							type: {
+								type: 'string',
+								fielddata: 'true'
+							},
 						}
 					}
 				}

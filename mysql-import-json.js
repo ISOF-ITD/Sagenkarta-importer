@@ -51,7 +51,9 @@ if (action == 'persons') {
 	console.log('Import persons');
 
 	var formatGender = function(gender) {
-		return gender == 'male' ? 'm' : gender == 'female' ? 'k' : gender;
+		// Slipper formatering, använder male, female och unknown
+		//return gender == 'male' ? 'm' : gender == 'female' ? 'k' : gender;
+		return gender;
 	}
 
 	var persons = _.uniq(_.flatten(_.map(fileData, function(item) {
@@ -102,12 +104,10 @@ if (action == 'records') {
 				console.log(error);
 			}
 			if (!error || argv.ignoreRecordsInsertError == 'yes') {
-				console.log('INSERT successful');
+				console.log('INSERT successful: '+item.id+': '+item.title);
 
 				if (item.taxonomy) {
 					_.each(item.taxonomy, function(category) {
-						console.log(category);
-
 						var recordsCategoriesQuery = 'INSERT INTO records_category (record, category) VALUES ('+connection.escape(item.id)+', '+connection.escape(category.category)+')';
 						connection.query(recordsCategoriesQuery, function(error1, results, fields) {
 							if (error1) {
@@ -132,13 +132,15 @@ if (action == 'records') {
 
 				if (item.places) {
 					_.each(item.places, function(place) {
-						var recordsPlacesQuery = 'INSERT INTO records_places (record, place, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(place.id)+', '+(place.type ? connection.escape(place.type) : connection.escape('place_collected'))+')';
-						connection.query(recordsPlacesQuery, function(error3, results, fields) {
-							if (error3) {
-								console.log(recordsPlacesQuery);
-								console.log(error3);
-							}
-						});
+						if (place.id && place.id != '') {
+							var recordsPlacesQuery = 'INSERT INTO records_places (record, place, type) VALUES ('+connection.escape(item.id)+', '+connection.escape(place.id)+', '+(place.type ? connection.escape(place.type) : connection.escape('place_collected'))+')';
+							connection.query(recordsPlacesQuery, function(error3, results, fields) {
+								if (error3) {
+									console.log(recordsPlacesQuery);
+									console.log(error3);
+								}
+							});
+						}
 					});
 				}
 
