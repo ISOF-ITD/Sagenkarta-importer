@@ -3,19 +3,21 @@ var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
 if (process.argv.length < 5) {
-	console.log('node elasticsearch-import.js [index name] [host] [login]');
+	console.log('node elasticsearch-import.js --index=[index name] --host=[host] --login=[login, behövs inte för oden-test]');
 
 	return;
 }
 
+var argv = require('minimist')(process.argv.slice(2));
+
 var currentPage = 0;
 
-var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'http://localhost:8000/api/ortnamn/?offset='+currentPage;
+	var recordsUrl = 'http://frigg-test.sprakochfolkminnen.se/ortnamnsregistret/api/ortnamn/?offset='+currentPage;
 	request({
 		url: recordsUrl,
 		json: true
@@ -30,7 +32,7 @@ var insertChunk = function() {
 			_.each(records, function(item, index) {
 				bulkBody.push({
 					create: {
-						_index: process.argv[2] || 'sagenkarta',
+						_index: argv.index,
 						_type: 'ortnamn',
 						_id: item.id
 					}
