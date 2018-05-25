@@ -2,7 +2,7 @@ var request = require('request');
 var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
 	console.log('node elasticsearch-import.js --index=[index name] --host=[host] --login=[login, behövs inte för oden-test]');
 
 	return;
