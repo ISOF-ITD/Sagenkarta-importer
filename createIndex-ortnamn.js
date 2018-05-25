@@ -1,20 +1,22 @@
 var _ = require('underscore');
 var elasticsearch = require('elasticsearch');
 
-if (process.argv.length < 5) {
-	console.log('node createIndex.js [index name] [host] [login]');
+if (process.argv.length < 4) {
+	console.log('node createIndex-ortnamn.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --cacert=[file path]');
 
 	return;
 }
 
-var esHost = 'https://'+(process.argv[4] ? process.argv[4]+'@' : '')+(process.argv[3] || 'localhost:9200');
+var argv = require('minimist')(process.argv.slice(2));
+
+var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 var client = new elasticsearch.Client({
 	host: esHost
 });
 
 client.indices.create({
-	index: process.argv[2] || 'sagenkarta',
+	index: argv.index,
 	body: {
 		mappings: {
 			ortnamn: {
