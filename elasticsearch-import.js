@@ -4,7 +4,7 @@ var _ = require('underscore');
 var fs = require('fs');
 
 if (process.argv.length < 4) {
-	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?] --bulk_action=[create|update]');
+	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?]');
 
 	return;
 }
@@ -52,14 +52,8 @@ var insertChunk = function() {
 			var bulkBody = [];
 
 			_.each(records, function(item, index) {
-				bulkBody.push(argv.bulk_action && argv.bulk_action == 'update' ? {
-						update: {
-							_index: argv.index || 'sagenkarta',
-							_type: 'legend',
-							_id: item.id
-						}
-					} : {
-						create: {
+				bulkBody.push({
+						index: {
 							_index: argv.index || 'sagenkarta',
 							_type: 'legend',
 							_id: item.id
@@ -133,9 +127,7 @@ var insertChunk = function() {
 					item.materialtype = 'tryckt';
 				}
 
-				bulkBody.push(argv.bulk_action == 'update' ? {
-					doc: item
-				} : item);
+				bulkBody.push(item);
 			});
 
 			var options = {
