@@ -9,7 +9,7 @@
   "author": "Instituten för språk och folkminnen/Trausti Dagsson",
   "license": "ISC",
   "dependencies": {
-    "elasticsearch": "^12.1.3",
+    "elasticsearch": "^15.1.1",
     "jsdom": "^11.5.1",
     "minimist": "^1.2.0",
     "mysql": "^2.11.1",
