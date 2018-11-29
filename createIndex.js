@@ -25,6 +25,9 @@ if (argv.cacert) {
 
 var client = new elasticsearch.Client(options);
 
+console.log(argv.host + ' ' + argv.index);
+console.log(new Date().toLocaleString());
+
 client.indices.create({
 	index: argv.index || 'sagenkarta',
 	body: {
@@ -334,3 +337,4 @@ client.indices.create({
 		});
 	})
 });
+console.log('End ' + new Date().toLocaleString());

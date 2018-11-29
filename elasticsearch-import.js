@@ -13,6 +13,13 @@ var argv = require('minimist')(process.argv.slice(2));
 
 var currentPage = 0;
 
+var maxPages = 10000000;
+
+if (argv.maxpages) {
+    maxPages = argv.maxpages;
+    console.log('maxpages=' + argv.maxpages);
+}
+
 var formatGender = function(gender) {
 	if (gender == 'K' ||
 		gender == 'k' ||
@@ -153,7 +160,9 @@ var insertChunk = function() {
 				}
 				currentPage += 50;
 
-				insertChunk();
+				if (currentPage < maxPages) {
+    				insertChunk();
+				}
 			});
 		}
 		else {
@@ -162,4 +171,6 @@ var insertChunk = function() {
 	});
 }
 
+console.log(argv.host);
+console.log(new Date().toLocaleString());
 insertChunk();
