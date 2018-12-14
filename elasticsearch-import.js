@@ -20,6 +20,11 @@ if (argv.maxpages) {
     console.log('maxpages=' + argv.maxpages);
 }
 
+if (argv.currentpage) {
+    currentPage = argv.currentpage;
+    console.log('currentPage=' + argv.currentpage);
+}
+
 var formatGender = function(gender) {
 	if (gender == 'K' ||
 		gender == 'k' ||
@@ -154,14 +159,17 @@ var insertChunk = function() {
 
 			client.bulk({
 				body: bulkBody
-			}, function(error) {
-				if (error) {
-					console.log(error);
+			}, function(result) {
+				if (result) {
+					console.log(result);
 				}
 				currentPage += 50;
 
 				if (currentPage < maxPages) {
-    				insertChunk();
+					pausecomp(5000);
+					insertChunk();
+				} else {
+					console.log('Stop at '+currentPage);
 				}
 			});
 		}
@@ -169,6 +177,14 @@ var insertChunk = function() {
 			console.log('all done');
 		}
 	});
+}
+
+function pausecomp(millis)
+{
+    var date = new Date();
+    var curDate = null;
+    do { curDate = new Date(); }
+    while(curDate-date < millis);
 }
 
 console.log(argv.host);
