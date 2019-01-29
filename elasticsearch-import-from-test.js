@@ -51,7 +51,7 @@ var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv
 // http://www4.sprakochfolkminnen.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'http://frigg-test.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
+	var recordsUrl = 'https://frigg-test.sprakochfolkminnen.se/sagendatabas/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
 		json: true
