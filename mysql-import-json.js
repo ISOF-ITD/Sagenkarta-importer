@@ -22,11 +22,13 @@ var connection = mysql.createConnection({
 });
 
 connection.connect();
+console.log('connection.connect()');
 
 var fileData = JSON.parse(fs.readFileSync(process.argv[2]));
 
 if (argv.limit && Number(argv.limit)) {
 	fileData = fileData.slice(0, argv.limit);
+	console.log('fileData');
 }
 
 if (action == 'categories') {
