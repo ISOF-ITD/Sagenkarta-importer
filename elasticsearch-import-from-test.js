@@ -67,7 +67,7 @@ var insertChunk = function() {
 				bulkBody.push({
 						index: {
 							_index: argv.index || 'sagenkarta',
-							_type: 'legend',
+							// _type: 'legend',
 							_id: item.id
 						}
 					}
