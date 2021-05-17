@@ -32,6 +32,10 @@ console.log(new Date().toLocaleString());
 client.indices.create({
 	index: argv.index || 'sagenkarta',
 	body: {
+		index: {
+			"number_of_shards": 1,
+			"number_of_replicas": 0,
+		},
 		mappings: {
 			// legend: {
 				
@@ -124,14 +128,15 @@ client.indices.create({
 							}
 						}
 					},
-					keyword: {
+					text: {
 						type: 'text',
 						analyzer: 'swedish',
 						term_vector: 'with_positions_offsets',
 						fields: {
 							raw: {
 								type: 'keyword',
-								index: 'true'
+								index: 'true',
+								ignore_above: 100000
 							}
 						}
 					},
