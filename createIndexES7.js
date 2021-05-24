@@ -136,7 +136,7 @@ client.indices.create({
 							raw: {
 								type: 'keyword',
 								index: 'true',
-								ignore_above: 100000
+								ignore_above: 32760
 							}
 						}
 					},
