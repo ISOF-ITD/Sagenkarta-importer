@@ -12,10 +12,14 @@ var argv = require('minimist')(process.argv.slice(2));
 
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
-var options = {
+if (argv.nooptions) {
+	var options = {};
+} else {
+	var options = {
 	host: esHost,
 	apiVersion: '7.x'
-};
+	};
+}
 
 if (argv.cacert) {
 	options.ssl = {
@@ -32,6 +36,10 @@ console.log(new Date().toLocaleString());
 client.indices.create({
 	index: argv.index || 'sagenkarta',
 	body: {
+		settings: {
+			"number_of_shards": 1,
+			"number_of_replicas": 0,
+		},
 		mappings: {
 			// legend: {
 				
@@ -124,14 +132,15 @@ client.indices.create({
 							}
 						}
 					},
-					keyword: {
+					text: {
 						type: 'text',
 						analyzer: 'swedish',
 						term_vector: 'with_positions_offsets',
 						fields: {
 							raw: {
 								type: 'keyword',
-								index: 'true'
+								index: 'true',
+								ignore_above: 32760
 							}
 						}
 					},
