@@ -12,10 +12,14 @@ var argv = require('minimist')(process.argv.slice(2));
 
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
-var options = {
+if (argv.nooptions) {
+	var options = {};
+} else {
+	var options = {
 	host: esHost,
 	apiVersion: '7.x'
-};
+	};
+}
 
 if (argv.cacert) {
 	options.ssl = {
