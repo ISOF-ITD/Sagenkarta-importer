@@ -38,7 +38,7 @@ client.indices.create({
 		},
 		mappings: {
 			// legend: {
-				
+
 				properties: {
 					topics_10_10: {
 						type: 'nested',
@@ -143,7 +143,7 @@ client.indices.create({
 					archive: {
 						properties: {
 							page: {
-								type: 'integer'
+								type: 'long'
 							}
 						}
 					},
@@ -286,6 +286,28 @@ client.indices.create({
 								type: 'text',
 								fielddata: 'true'
 							},
+						}
+					},
+					media: {
+						type: 'nested',
+						properties: {
+							timeslots: {
+								type: 'nested',
+								properties: {
+									text: {
+										type: 'text',
+										analyzer: 'swedish',
+										term_vector: 'with_positions_offsets',
+										fields: {
+											raw: {
+												type: 'keyword',
+												index: 'true',
+												ignore_above: 32760
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
