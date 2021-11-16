@@ -295,6 +295,12 @@ client.indices.create({
 					media: {
 						type: 'nested',
 						properties: {
+							source: {
+								type: 'keyword',
+								index: 'true',
+								//ignore_above: 32760
+								}
+							}
 							timeslots: {
 								type: 'nested',
 								properties: {
@@ -309,7 +315,7 @@ client.indices.create({
 												ignore_above: 32760
 											}
 										}
-									}
+									},
 								}
 							}
 						}
