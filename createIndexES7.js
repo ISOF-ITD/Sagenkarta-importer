@@ -296,11 +296,19 @@ client.indices.create({
 						type: 'nested',
 						properties: {
 							source: {
-								type: 'keyword',
-								index: 'true',
-								//ignore_above: 32760
+								type: 'text',
+								fields: {
+									keyword: {
+										type: 'keyword',
+										ignore_above: 256
+									}
 								}
-							}
+							},
+							//source: {
+								//type: 'keyword',
+								//index: 'true',
+								//ignore_above: 32760
+							//},
 							timeslots: {
 								type: 'nested',
 								properties: {
