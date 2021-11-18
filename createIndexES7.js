@@ -293,7 +293,7 @@ client.indices.create({
 						}
 					},
 					media: {
-						type: 'nested',
+						//type: 'nested',
 						properties: {
 							source: {
 								type: 'text',
