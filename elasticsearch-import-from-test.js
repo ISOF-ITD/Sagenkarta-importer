@@ -1,3 +1,6 @@
+//https://stackoverflow.com/questions/20433287/node-js-request-cert-has-expired
+//DANGEROUS This disables HTTPS / SSL / TLS checking across your entire node.js environment.
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var request = require('request');
 var elasticsearch = require('elasticsearch');
 var _ = require('underscore');
