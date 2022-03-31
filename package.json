@@ -11,7 +11,7 @@
   "dependencies": {
     "elasticsearch": "^15.1.1",
     "jsdom": "^11.5.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.6",
     "mysql": "^2.11.1",
     "underscore": "^1.8.3"
   }
