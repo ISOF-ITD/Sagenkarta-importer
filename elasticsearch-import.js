@@ -57,7 +57,8 @@ var insertChunk = function() {
 	var recordsUrl = 'http://frigg.isof.se/sagendatabas/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
-		json: true
+		json: true,
+		strictSSL: false,
 	}, function (error, response, body) {
 		console.log(recordsUrl);
 
