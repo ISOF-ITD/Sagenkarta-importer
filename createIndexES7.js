@@ -132,6 +132,24 @@ client.indices.create({
 							}
 						}
 					},
+					contents: {
+						type: 'text',
+						analyzer: 'swedish',
+						fields: {
+							raw: {
+								type: 'text'
+							}
+						}
+					},
+					headwords: {
+						type: 'text',
+						analyzer: 'swedish',
+						fields: {
+							raw: {
+								type: 'text'
+							}
+						}
+					},
 					text: {
 						type: 'text',
 						analyzer: 'swedish',
