@@ -128,7 +128,8 @@ client.indices.create({
 						analyzer: 'swedish',
 						fields: {
 							raw: {
-								type: 'text'
+								type: 'text',
+								analyzer: 'simple'
 							}
 						}
 					},
@@ -137,7 +138,8 @@ client.indices.create({
 						analyzer: 'swedish',
 						fields: {
 							raw: {
-								type: 'text'
+								type: 'text',
+								analyzer: 'simple'
 							}
 						}
 					},
@@ -146,7 +148,8 @@ client.indices.create({
 						analyzer: 'swedish',
 						fields: {
 							raw: {
-								type: 'text'
+								type: 'text',
+								analyzer: 'simple'
 							}
 						}
 					},
@@ -203,6 +206,7 @@ client.indices.create({
 								fields: {
 									raw: {
 										type: 'text',
+										analyzer: 'simple',
 										fielddata: true
 									}
 								},
