@@ -159,9 +159,8 @@ client.indices.create({
 						term_vector: 'with_positions_offsets',
 						fields: {
 							raw: {
-								type: 'keyword',
-								index: 'true',
-								ignore_above: 32760
+								type: 'text',
+								analyzer: 'simple'
 							}
 						}
 					},
