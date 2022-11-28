@@ -167,7 +167,7 @@ client.indices.create({
 					archive: {
 						properties: {
 							page: {
-								type: 'long'
+								type: 'text'
 							}
 						}
 					},
