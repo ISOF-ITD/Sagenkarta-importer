@@ -1,0 +1,12 @@
+PUT isof_publik/_mapping
+	{
+		archive: {
+			properties: {
+				archive_key: {
+					type: 'keyword',
+					#type: 'integer',
+					index: 'true'
+				},
+			}
+		},
+	}
