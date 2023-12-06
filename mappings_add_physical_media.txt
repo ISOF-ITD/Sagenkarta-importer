@@ -1,3 +1,6 @@
+Use?:
+							"ignore_above" : 256
+
 PUT isof_publik/_mapping
 	{
 		"physical_media": {
@@ -26,8 +29,8 @@ PUT isof_publik/_mapping
 					"type" : "text",
 					"fields" : {
 						"keyword" : {
-						"type" : "keyword",
-						"ignore_above" : 256
+							"type" : "keyword",
+							"index": "true"
 						}
 					}
 				},
