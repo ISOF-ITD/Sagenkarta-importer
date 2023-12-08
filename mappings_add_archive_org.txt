@@ -1,6 +1,6 @@
 # The way that Elasticsearch indexes numbers optimizes for range queries while keyword fields are better at term queries. 
 					#type: 'integer',
-PUT isof-publik_20221128/_mapping
+PUT isof-publik_20221209/_mapping
 	{
 		"properties": {
   		"archive": {
