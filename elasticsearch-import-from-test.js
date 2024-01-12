@@ -54,7 +54,7 @@ var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv
 // http://www4.isof.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'https://frigg-test.isof.se/sagendatabas/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
+	var recordsUrl = 'https://garm-test.isof.se/folkeservice/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
 		json: true
