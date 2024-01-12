@@ -465,6 +465,7 @@ client.indices.create({
 							comment: {
 								type: 'text'
 							}
+						}
 					},
 					media: {
 						// Idag utan nested MEN krävs för sökbarhet där varje rad (objekt) är oberoende av varandra
