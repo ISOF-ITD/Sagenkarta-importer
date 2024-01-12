@@ -177,7 +177,7 @@ client.indices.create({
 						}
 					},
 					language: {
-						type: text,
+						type: 'text',
 						fields : {
 							keyword: {
 								type : 'keyword',
@@ -542,7 +542,7 @@ client.indices.create({
 								index: 'true'
 							},
 							value: {
-								type: text,
+								type: 'text',
 								fields : {
 									keyword: {
 										type : 'keyword',
@@ -572,11 +572,11 @@ client.indices.create({
 								index: 'true'
 							},
 							count_description: {
-								type: text,
+								type: 'text',
 								index: 'false'
 							},
 							language: {
-								type: text,
+								type: 'text',
 								fields : {
 									keyword: {
 										type : 'keyword',
