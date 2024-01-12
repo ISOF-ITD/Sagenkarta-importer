@@ -528,7 +528,7 @@ client.indices.create({
 												ignore_above: 32760
 											}
 										}
-									},
+									}
 								}
 							}
 						}
