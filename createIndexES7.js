@@ -209,7 +209,7 @@ client.indices.create({
 						}
 					  },
  					source: {
-						type: "text",
+						type: 'text',
 						fields: {
 						  keyword: {
 							type: 'keyword',
@@ -431,14 +431,14 @@ client.indices.create({
 								index: 'true'
 							},
 							fylke: {
-								type: "text",
+								type: 'text',
 								fields: {
 								  keyword: {
 									type: 'keyword',
 									ignore_above: 256
 								  }
 								}
-							  },
+							},
 							lm_id: {
 								type: 'text',
 								fielddata: 'true'
@@ -643,10 +643,8 @@ client.indices.create({
 						  "pattern": "[^åöäüëïÅÖÄÜËÏáéíóúÁÉÍÓÚàèìòùâêîôûÀÈÌÒÙÂÊÎÔÛẞßa-zA-Z0-9# ]",
 						  "replacement": ""
 						}
-					  }
-				  
+					}
 				}
-
 			}
 		}, function(settingsErr) {
 			if (settingsErr) {
