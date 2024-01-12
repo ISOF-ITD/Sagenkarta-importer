@@ -3,41 +3,44 @@ Use?:
 
 PUT isof_publik/_mapping
 	{
-		"physical_media": {
-			"properties": {
-				"specified_type": {
-					"type": "keyword",
-					"index": "true"
-				},
-				"type": {
-					"type": "keyword",
-					"index": "true"
-				},
-				"media": {
-					"type": "keyword",
-					"index": "true"
-				},
-				"count": {
-					"type": "long",
-					"index": "true"
-				},
-				"count_description": {
-					"type": "text",
-					"index": "false"
-				},
-				"language": {
-					"type" : "text",
-					"fields" : {
-						"keyword" : {
-							"type" : "keyword",
-							"index": "true"
+		"properties": {
+			"physical_media": {
+				"properties": {
+					"specified_type": {
+						"type": "keyword",
+						"index": "true"
+					},
+					"type": {
+						"type": "keyword",
+						"index": "true"
+					},
+					"media": {
+						"type": "keyword",
+						"index": "true"
+					},
+					"count": {
+						"type": "long",
+						"index": "true"
+					},
+					"count_description": {
+						"type": "text",
+						"index": "false"
+					},
+					"language": {
+						"type" : "text",
+						"fields" : {
+							"keyword" : {
+								"type" : "keyword",
+								"index": "true"
+							}
 						}
+					},
+					"questionnaire": {
+						"type": "keyword",
+						"index": "true"
 					}
-				},
-				"questionnaire": {
-					"type": "keyword",
-					"index": "true"
 				}
 			}
 		}
 	}
+	

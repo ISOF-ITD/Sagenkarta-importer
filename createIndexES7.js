@@ -116,6 +116,12 @@ client.indices.create({
 						type: 'text',
 						fielddata: 'true'
 					},
+					transcriptiondate: {
+						type: 'date'
+					},
+					approvedate: {
+						type: 'date'
+					},
 					id: {
 						type: 'text',
 						fielddata: 'true'
@@ -124,6 +130,19 @@ client.indices.create({
 						type: 'date'
 					},
 					title: {
+						type: 'text',
+						analyzer: 'swedish',
+						fields: {
+							raw: {
+								type: 'text',
+								analyzer: 'simple'
+							}
+						}
+					},
+					changedate: {
+						type: 'date'
+					},
+					comments: {
 						type: 'text',
 						analyzer: 'swedish',
 						fields: {
@@ -143,6 +162,10 @@ client.indices.create({
 							}
 						}
 					},
+					copyrightlicense: {
+						type: 'text',
+						index: 'true'
+					},
 					headwords: {
 						type: 'text',
 						analyzer: 'swedish',
@@ -153,6 +176,46 @@ client.indices.create({
 							}
 						}
 					},
+					language: {
+						type: text,
+						fields : {
+							keyword: {
+								type : 'keyword',
+								index: 'true'
+							}
+						}
+					},
+					numberofonerecord: {
+						type: 'long'
+					},
+					numberoftranscribedonerecord: {
+						type: 'long'
+					},
+					publishstatus: {
+						type: 'keyword',
+						index: 'true'
+					},
+					recordtype: {
+						type: 'keyword',
+						index: 'true'
+					},
+					// För copy_to
+ 					search_other: {
+						type: 'text',
+						fields: {
+						  keyword: {
+							type: 'keyword',
+						  }
+						}
+					  },
+ 					source: {
+						type: "text",
+						fields: {
+						  keyword: {
+							type: 'keyword',
+						  }
+						}
+					  },
 					text: {
 						type: 'text',
 						analyzer: 'swedish',
@@ -164,10 +227,57 @@ client.indices.create({
 							}
 						}
 					},
+					transcribedby: {
+						type: 'text',
+						//index: 'true',
+						fields: {
+							keyword: {
+							  type: 'keyword',
+							  ignore_above: 256
+						}
+					},
+					transcriptiondate: {
+						type: 'date'
+					},
+					transcriptionstatus: {
+						type: 'keyword',
+						index: 'true'
+					},
+					transcriptiontype: {
+						type: 'keyword',
+						index: 'true'
+					},
+					update_status: {
+						type: 'keyword',
+						index: 'true'
+					},
 					archive: {
 						properties: {
+							archive: {
+								type: 'text'
+							},
+							archive_id: {
+								type: 'text'
+							},
+							archive_id_row: {
+								type: 'text'
+							},
+							archive_row: {
+								type: 'long'
+							},
+							archive_org: {
+								type: 'keyword',
+								index: 'true'
+							},
+							country: {
+								type: 'text',
+								index: 'true'
+							},
 							page: {
 								type: 'text'
+							},
+							total_pages: {
+								type: 'long'
 							}
 						}
 					},
@@ -211,6 +321,17 @@ client.indices.create({
 								},
 								copy_to: 'search_other'
 							},
+							// name_analysed skapas som en kopia av name vid elasticsearch-import.js och ska ha type keyword i mapping (som den verkat fått som default)
+							// Förslag: ta bort name_analysed och lägg till type keyword på fält "name" i mapping (name.keyword) - Ändra också i ES-api views.py
+							name_analysed: {
+								type: 'text',
+								fields: {
+								  keyword: {
+									type: 'keyword',
+									ignore_above: 256
+								  }
+								}
+							},
 							gender: {
 								type: 'keyword',
 								index: 'true'
@@ -222,6 +343,15 @@ client.indices.create({
 							birth_year: {
 								type: 'date'
 							},
+							birthplace: {
+								type: 'text',
+								fields: {
+								  keyword: {
+									type: 'keyword',
+									ignore_above: 256
+								  }
+								}
+							  },
 							home: {
 								type: 'nested',
 								include_in_root: true,
@@ -261,9 +391,16 @@ client.indices.create({
 										index: 'true',
 										copy_to: 'search_other'
 									},
+									fylke: {
+										type: 'keyword',
+										index: 'true'
+									},
 									type: {
 										type: 'keyword',
 										index: 'true'
+									},
+									comment: {
+										type: 'text'
 									}
 								}
 							}
@@ -293,6 +430,15 @@ client.indices.create({
 								type: 'keyword',
 								index: 'true'
 							},
+							fylke: {
+								type: "text",
+								fields: {
+								  keyword: {
+									type: 'keyword',
+									ignore_above: 256
+								  }
+								}
+							  },
 							lm_id: {
 								type: 'text',
 								fielddata: 'true'
@@ -307,13 +453,20 @@ client.indices.create({
 								index: 'true',
 								copy_to: 'search_other'
 							},
-							type: {
-								type: 'text',
-								fielddata: 'true'
+							fylke: {
+								type: 'keyword',
+								index: 'true'
 							},
-						}
+							type: {
+								type: 'keyword',
+								index: 'true'
+							},
+							comment: {
+								type: 'text'
+							}
 					},
 					media: {
+						// Idag utan nested MEN krävs för sökbarhet där varje rad (objekt) är oberoende av varandra
 						//type: 'nested',
 						properties: {
 							source: {
@@ -330,6 +483,36 @@ client.indices.create({
 								//index: 'true',
 								//ignore_above: 32760
 							//},
+							store: {
+								type: 'keyword',
+								index: 'true'
+							},
+							title: {
+								type: 'text',
+								analyzer: 'swedish',
+								term_vector: 'with_positions_offsets',
+								fields: {
+									raw: {
+										type: 'text',
+										analyzer: 'simple'
+									}
+								}
+							},
+							text: {
+								type: 'text',
+								analyzer: 'swedish',
+								term_vector: 'with_positions_offsets',
+								fields: {
+									raw: {
+										type: 'text',
+										analyzer: 'simple'
+									}
+								}
+							},
+							type: {
+								type: 'keyword',
+								index: 'true'
+							},
 							timeslots: {
 								type: 'nested',
 								properties: {
@@ -346,6 +529,62 @@ client.indices.create({
 										}
 									},
 								}
+							}
+						}
+					},
+					metadata: {
+						type: 'nested',
+						properties: {
+							type: {
+								type: 'keyword',
+								index: 'true'
+							},
+							value: {
+								type: text,
+								fields : {
+									keyword: {
+										type : 'keyword',
+										index: 'true'
+									}
+								}
+							}
+						}
+					},
+					physical_media: {
+						type: 'nested',
+						properties: {
+							specified_type: {
+								type: 'keyword',
+								index: 'true'
+							},
+							type: {
+								type: 'keyword',
+								index: 'true'
+							},
+							media: {
+								type: 'keyword',
+								index: 'true'
+							},
+							count: {
+								type: 'long',
+								index: 'true'
+							},
+							count_description: {
+								type: text,
+								index: 'false'
+							},
+							language: {
+								type: text,
+								fields : {
+									keyword: {
+										type : 'keyword',
+										index: 'true'
+									}
+								}
+							},
+							questionnaire: {
+								type: 'keyword',
+								index: 'true'
 							}
 						}
 					}
@@ -380,18 +619,32 @@ client.indices.create({
 
 					"analyzer": {
 						"swedish": {
-							"tokenizer": "standard",
-							"filter": [
-								"lowercase",
-								"swedish_stop",
-								"swedish_stemmer"
-							],
+							"type": "custom",
+							"tokenizer": "whitespace",
 							"char_filter": [
-								"html_strip"
+							  "add_whitespace_next_to_three_hashes",
+							  "punctuation_removal"
+							],
+							"filter": [
+							  "lowercase",
+							  "swedish_stop",
+							  "swedish_stemmer"
 							]
 						}
-					}
-
+					},
+					"char_filter": {
+						"add_whitespace_next_to_three_hashes": {
+						  "type": "pattern_replace",
+						  "pattern": "###",
+						  "replacement": " ### "
+						},
+						"punctuation_removal": {
+						  "type": "pattern_replace",
+						  "pattern": "[^åöäüëïÅÖÄÜËÏáéíóúÁÉÍÓÚàèìòùâêîôûÀÈÌÒÙÂÊÎÔÛẞßa-zA-Z0-9# ]",
+						  "replacement": ""
+						}
+					  }
+				  
 				}
 
 			}
