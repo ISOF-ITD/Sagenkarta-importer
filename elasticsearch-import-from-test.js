@@ -52,6 +52,8 @@ var formatGender = function(gender) {
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 // http://www4.isof.se/sagner/api/json_export
+// Test
+// https://garm-test.isof.se/folkeservice/api/records/?offset=0&type=arkiv&publishstatus=published
 
 var insertChunk = function() {
 	var recordsUrl = 'https://garm-test.isof.se/folkeservice/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
@@ -59,7 +61,7 @@ var insertChunk = function() {
 		url: recordsUrl,
 		json: true
 	}, function (error, response, body) {
-		console.log(recordsUrl);
+		console.log(new Date().toLocaleString() + ": " + recordsUrl);
 
 		var records = body.results;
 
