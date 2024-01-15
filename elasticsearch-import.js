@@ -60,7 +60,7 @@ var insertChunk = function() {
 		json: true,
 		strictSSL: false,
 	}, function (error, response, body) {
-		console.log(recordsUrl);
+		console.log(new Date().toLocaleString() + ": " + recordsUrl);
 
 		var records = body.results;
 
