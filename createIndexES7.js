@@ -266,7 +266,12 @@ client.indices.create({
 								type: 'text'
 							},
 							archive_id_row: {
-								type: 'text'
+								type: 'text',
+								fields: {
+									keyword: {
+									  type: 'keyword',
+									}
+								}
 							},
 							archive_row: {
 								type: 'long'
