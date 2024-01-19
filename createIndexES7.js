@@ -124,7 +124,12 @@ client.indices.create({
 					},
 					id: {
 						type: 'text',
-						fielddata: 'true'
+						fielddata: 'true',
+						fields: {
+							keyword: {
+							  type: 'keyword'
+							}
+						}
 					},
 					year: {
 						type: 'date'
