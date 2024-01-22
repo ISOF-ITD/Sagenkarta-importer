@@ -123,6 +123,7 @@ client.indices.create({
 						type: 'date'
 					},
 					id: {
+						// Type text to be able to search part of id, for example without "page number part"
 						type: 'text',
 						fielddata: 'true',
 						fields: {
@@ -266,6 +267,7 @@ client.indices.create({
 								type: 'text'
 							},
 							archive_id_row: {
+								// Type text to be part of full text search
 								type: 'text',
 								fields: {
 									keyword: {
@@ -285,7 +287,14 @@ client.indices.create({
 								index: 'true'
 							},
 							page: {
-								type: 'text'
+								// Type text to be able to register non-numeric pages, like 10A, 10B
+								type: 'text',
+								fields: {
+									// Type long to be able to sort as a numeric value
+									long: {
+									  type: 'long',
+									}
+								}
 							},
 							total_pages: {
 								type: 'long'
