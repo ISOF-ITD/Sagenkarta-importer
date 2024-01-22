@@ -293,6 +293,8 @@ client.indices.create({
 									// Type long to be able to sort as a numeric value
 									long: {
 									  type: 'long',
+									  // Ignore malformed numbers (as field is a character field for now: to handle pages like 10A, 10B)
+									  ignore_malformed: 'true'
 									}
 								}
 							},
