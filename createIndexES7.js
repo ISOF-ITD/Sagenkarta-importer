@@ -556,7 +556,8 @@ client.indices.create({
 						}
 					},
 					metadata: {
-						type: 'nested',
+						// Idag fungerar inte med nested för frågor med folkmusik! MEN krävs för sökbarhet där varje rad (objekt) är oberoende av varandra
+						// type: 'nested',
 						properties: {
 							type: {
 								type: 'keyword',
