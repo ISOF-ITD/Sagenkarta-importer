@@ -149,8 +149,16 @@ var insertChunk = function() {
 			});
 
 			var options = {
-				host: esHost,
-				log: 'trace'
+				node: esHost,
+				log: 'trace',
+				auth: {
+					username: 'your-username',
+					password: 'your-password'
+				},
+				// Create a custom agent with rejectUnauthorized set to false
+				tls: {
+					rejectUnauthorized: false
+				}	
 			};
 
 			if (argv.cacert) {
