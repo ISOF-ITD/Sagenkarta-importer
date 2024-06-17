@@ -175,25 +175,28 @@ var insertChunk = function() {
 			console.log(options);
 			var client = new elasticsearch.Client(options);
 
-			client.bulk({
-				body: bulkBody
-			}, function(result) {
-				if (result) {
-					console.log('result:');
-					console.log(result);
-				}
-				currentPage += 50;
+			try {			
+				client.bulk({
+					body: bulkBody
+				}, function(result) {
+					if (result) {
+						console.log('result:');
+						console.log(result);
+					}
+					currentPage += 50;
 
-				if (currentPage < maxPages) {
-				console.log('pausecomp');
-				pausecomp(5000);
-					insertChunk();
-				} else {
-					console.log('Stop at '+currentPage);
-				}
-			});
-		}
-		else {
+					if (currentPage < maxPages) {
+					console.log('pausecomp');
+					pausecomp(5000);
+						insertChunk();
+					} else {
+						console.log('Stop at '+currentPage);
+					}
+				});
+			} catch (error) {
+				console.error('Error executing bulk insert:', error);
+			}
+		} else {
 			console.log('all done');
 		}
 	});
