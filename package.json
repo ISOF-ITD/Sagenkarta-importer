@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "elasticsearch": "^15.1.1",
+    "@elastic/elasticsearch": "^8.13.1",
     "jsdom": "^11.5.1",
     "minimist": "^1.2.0",
     "mysql": "^2.11.1",
