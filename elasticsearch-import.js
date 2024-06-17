@@ -169,8 +169,10 @@ var insertChunk = function() {
 					rejectUnauthorized: true
 				};
 			}
+			//console.log(bulkBody.length);
 
 
+			console.log(options);
 			var client = new elasticsearch.Client(options);
 
 			client.bulk({
@@ -183,7 +185,8 @@ var insertChunk = function() {
 				currentPage += 50;
 
 				if (currentPage < maxPages) {
-					pausecomp(5000);
+				console.log('pausecomp');
+				pausecomp(5000);
 					insertChunk();
 				} else {
 					console.log('Stop at '+currentPage);
