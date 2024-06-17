@@ -54,7 +54,7 @@ var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv
 // http://www4.isof.se/sagner/api/json_export
 
 var insertChunk = function() {
-	var recordsUrl = 'http://garm.isof.se/folkeservice/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
+	var recordsUrl = 'https://garm.isof.se/folkeservice/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
 		json: true,
@@ -66,10 +66,12 @@ var insertChunk = function() {
 
 		var records = body.results;
 
+		//console.log(records.length);
 		if (records.length > 0) {		
 			var bulkBody = [];
 
 			_.each(records, function(item, index) {
+				//console.log(bulkBody);
 				bulkBody.push({
 						index: {
 							_index: argv.index || 'sagenkarta',
@@ -175,6 +177,7 @@ var insertChunk = function() {
 				body: bulkBody
 			}, function(result) {
 				if (result) {
+					console.log('result:');
 					console.log(result);
 				}
 				currentPage += 50;
