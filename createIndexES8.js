@@ -1,6 +1,6 @@
 var _ = require('underscore');
 var fs = require('fs');
-const elasticsearch = require('elasticsearch')
+const elasticsearch = require('@elastic/elasticsearch')
 
 if (process.argv.length < 4) {
 	console.log('node createIndex.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --cacert=[file path]');

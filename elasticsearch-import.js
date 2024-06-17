@@ -2,7 +2,7 @@
 //DANGEROUS This disables HTTPS / SSL / TLS checking across your entire node.js environment.
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var request = require('request');
-var elasticsearch = require('elasticsearch');
+var elasticsearch = require('@elastic/elasticsearch');
 var _ = require('underscore');
 var fs = require('fs');
 
