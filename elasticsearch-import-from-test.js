@@ -2,12 +2,12 @@
 //DANGEROUS This disables HTTPS / SSL / TLS checking across your entire node.js environment.
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var request = require('request');
-var elasticsearch = require('elasticsearch');
+var elasticsearch = require('@elastic/elasticsearch');
 var _ = require('underscore');
 var fs = require('fs');
 
 if (process.argv.length < 4) {
-	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?]');
+	console.log('node elasticsearch-import.js --host=[Elasticsearch host] --user=[Elasticsearch user] --password=[Elasticsearch password] --login=[Elasticsearch login] --index=[index name] --rest_params=[Rest API params?]');
 
 	return;
 }
@@ -52,29 +52,34 @@ var formatGender = function(gender) {
 var esHost = (argv.host.indexOf('https://') > -1 ? 'https://' : 'http://')+(argv.login ? argv.login+'@' : '')+(argv.host.replace('http://', '').replace('https://', ''));
 
 // http://www4.isof.se/sagner/api/json_export
-// Test
-// https://garm-test.isof.se/folkeservice/api/records/?offset=0&type=arkiv&publishstatus=published
-
-var insertChunk = function() {
+// Updated code accroding to javascript-api version 8.14 from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/bulk_examples.html
+function insertChunk() {
+//var insertChunk = function() {
 	var recordsUrl = 'https://garm-test.isof.se/folkeservice/api/records/?offset='+currentPage+(argv.rest_params ? '&'+argv.rest_params : '');
 	request({
 		url: recordsUrl,
-		json: true
-	}, function (error, response, body) {
+		json: true,
+		strictSSL: false,
+	}, async function (error, response, body) {
 		console.log(new Date().toLocaleString() + ": " + recordsUrl);
 		//console.log(response);
-		console.log(error);
+		if (error) console.log(error);
 
 		var records = body.results;
 
+		//console.log('records.length');
+		console.log(records.length);
 		if (records.length > 0) {		
 			var bulkBody = [];
 
+			//console.log('before _each');
 			_.each(records, function(item, index) {
+				//console.log('before bulkBody push');
+				//console.log(bulkBody);
 				bulkBody.push({
 						index: {
 							_index: argv.index || 'sagenkarta',
-							// _type: 'legend',
+							//_type: 'legend',
 							_id: item.id
 						}
 					}
@@ -150,8 +155,16 @@ var insertChunk = function() {
 			});
 
 			var options = {
-				host: esHost,
-				log: 'trace'
+				node: esHost,
+				log: 'trace',
+				auth: {
+					username: argv.user,
+					password: argv.password
+				},
+				// Create a custom agent with rejectUnauthorized set to false
+				tls: {
+					rejectUnauthorized: false
+				}	
 			};
 
 			if (argv.cacert) {
@@ -160,27 +173,61 @@ var insertChunk = function() {
 					rejectUnauthorized: true
 				};
 			}
+			console.log(bulkBody.length);
 
 
+			console.log(options);
 			var client = new elasticsearch.Client(options);
 
-			client.bulk({
-				body: bulkBody
-			}, function(result) {
-				if (result) {
+			try {			
+				console.log('before client.bulk');
+				console.log(bulkBody.length);
+				// Updated code accroding to javascript-api version 8.14 from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/bulk_examples.html
+				// await function instead of return function 
+				const response = await client.bulk({
+					body: bulkBody
+				});
+				if (response.errors) {
+					console.log('Bulk insert had errors:', response.errors);
+				  } else {
+					currentPage += 50;
+					if (currentPage < maxPages) {
+						//console.log('before pausecomp');
+						pausecomp(5000);
+						//console.log('before insertChunk');
+						insertChunk();
+						//console.log('after insertChunk');
+					} else {
+						console.log('Stop at '+currentPage);
+					}
+					console.log('Bulk insert was successful');
+				  }				
+				//Old API with return function instead of await: elasticsearch@15.5.0:
+/* 				, function(result) {
+					console.log('before if result');
 					console.log(result);
-				}
-				currentPage += 50;
+					if (result) {
+						console.log('result:');
+						console.log(result);
+					}
+					console.log('after if result');
+					currentPage += 50;
 
-				if (currentPage < maxPages) {
-					pausecomp(5000);
-					insertChunk();
-				} else {
-					console.log('Stop at '+currentPage);
-				}
-			});
-		}
-		else {
+					if (currentPage < maxPages) {
+						console.log('before pausecomp');
+						pausecomp(5000);
+						console.log('before insertChunk');
+						insertChunk();
+						console.log('after insertChunk');
+					} else {
+						console.log('Stop at '+currentPage);
+					}
+				}); */
+				console.log('after client.bulk');
+			} catch (error) {
+				console.error('Error executing bulk insert:', error);
+			}
+		} else {
 			console.log('all done');
 		}
 	});
