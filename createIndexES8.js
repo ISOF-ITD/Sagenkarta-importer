@@ -19,8 +19,10 @@ if (argv.nooptions) {
 		node: esHost,
 		apiVersion: '8.x',
 		auth: {
-			username: 'your-username',
-			password: 'your-password'
+            username: argv.user,
+            password: argv.password
+			//username: 'your-username',
+			//password: 'your-password'
 		},
 		// Create a custom agent with rejectUnauthorized set to false
 		tls: {
@@ -47,6 +49,45 @@ client.indices.create({
 		settings: {
 			"number_of_shards": 1,
 			"number_of_replicas": 0,
+			"analysis": {
+				"filter": {
+					"swedish_stop": {
+						"type": "stop",
+						"stopwords": "_swedish_"
+					},
+					"swedish_stemmer": {
+						"type": "stemmer",
+						"language": "swedish"
+					}
+				},
+				"analyzer": {
+					"swedish": {
+						"type": "custom",
+						"tokenizer": "whitespace",
+						"char_filter": [
+						  "add_whitespace_next_to_three_hashes",
+						  "punctuation_removal"
+						],
+						"filter": [
+						  "lowercase",
+						  "swedish_stop",
+						  "swedish_stemmer"
+						]
+					}
+				},
+				"char_filter": {
+					"add_whitespace_next_to_three_hashes": {
+					  "type": "pattern_replace",
+					  "pattern": "###",
+					  "replacement": " ### "
+					},
+					"punctuation_removal": {
+					  "type": "pattern_replace",
+					  "pattern": "[^åöäüëïÅÖÄÜËÏáéíóúÁÉÍÓÚàèìòùâêîôûÀÈÌÒÙÂÊÎÔÛẞßa-zA-Z0-9# ]",
+					  "replacement": ""
+					}
+				}
+			}			
 		},
 		mappings: {
 			// legend: {
@@ -631,61 +672,6 @@ client.indices.create({
 
 	client.indices.close({
 		index: argv.index || 'sagenkarta',
-	}, function() {
-		client.indices.putSettings({
-			index: argv.index || 'sagenkarta',
-			body: {
-
-				"analysis": {
-
-					"filter": {
-						"swedish_stop": {
-							"type": "stop",
-							"stopwords": "_swedish_"
-						},
-						"swedish_stemmer": {
-							"type": "stemmer",
-							"language": "swedish"
-						}
-					},
-
-					"analyzer": {
-						"swedish": {
-							"type": "custom",
-							"tokenizer": "whitespace",
-							"char_filter": [
-							  "add_whitespace_next_to_three_hashes",
-							  "punctuation_removal"
-							],
-							"filter": [
-							  "lowercase",
-							  "swedish_stop",
-							  "swedish_stemmer"
-							]
-						}
-					},
-					"char_filter": {
-						"add_whitespace_next_to_three_hashes": {
-						  "type": "pattern_replace",
-						  "pattern": "###",
-						  "replacement": " ### "
-						},
-						"punctuation_removal": {
-						  "type": "pattern_replace",
-						  "pattern": "[^åöäüëïÅÖÄÜËÏáéíóúÁÉÍÓÚàèìòùâêîôûÀÈÌÒÙÂÊÎÔÛẞßa-zA-Z0-9# ]",
-						  "replacement": ""
-						}
-					}
-				}
-			}
-		}, function(settingsErr) {
-			if (settingsErr) {
-				console.log(settingsErr);
-			}
-			client.indices.open({
-				index: argv.index || 'sagenkarta'
-			})
-		});
 	})
 });
 console.log('End ' + new Date().toLocaleString());
