@@ -539,7 +539,7 @@ client.indices.create({
 					},
 					media: {
 						// Idag utan nested MEN krävs för sökbarhet där varje rad (objekt) är oberoende av varandra
-						//type: 'nested',
+						type: 'nested',
 						properties: {
 							source: {
 								type: 'text',
