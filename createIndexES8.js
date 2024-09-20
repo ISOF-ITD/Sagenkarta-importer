@@ -240,6 +240,19 @@ client.indices.create({
 							}
 						}
 					},
+					languages: {
+						type: 'nested',
+						properties: {
+							name: {
+								type: 'keyword',
+								index: 'true',
+							},
+							code: {
+								type: 'keyword',
+								index: 'true',
+							},
+						}
+					},
 					numberofonerecord: {
 						type: 'long'
 					},
