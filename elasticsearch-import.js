@@ -164,7 +164,19 @@ function insertChunk() {
 				// Create a custom agent with rejectUnauthorized set to false
 				tls: {
 					rejectUnauthorized: false
-				}	
+				}
+				// This setup should help you handle connection issues during bulk inserts by fine-tuning the client configuration
+				requestTimeout: 180000,
+				maxRetries: 10,
+				sniffOnStart: false,
+				sniffInterval: false,
+				sniffOnConnectionFault: true,
+				keepAlive: true,
+				maxSockets: 25,
+				agent: {
+					keepAlive: true,
+					keepAliveMsecs: 180000,
+				}				
 			};
 
 			if (argv.cacert) {
