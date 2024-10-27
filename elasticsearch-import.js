@@ -167,6 +167,8 @@ function insertChunk() {
 				},
 				// This setup should help you handle connection issues during bulk inserts by fine-tuning the client configuration
 				requestTimeout: 180000,
+				timeout: 180,  // Increase timeout
+				retryOnTimeout: true,  // Enable retry on timeout
 				maxRetries: 10,
 				sniffOnStart: false,
 				sniffInterval: false,
