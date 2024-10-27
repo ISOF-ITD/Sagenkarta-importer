@@ -172,11 +172,11 @@ function insertChunk() {
 				sniffInterval: false,
 				sniffOnConnectionFault: true,
 				keepAlive: true,
-				maxSockets: 25,
-				agent: {
-					keepAlive: true,
-					keepAliveMsecs: 180000,
-				}				
+				maxSockets: 25//,
+				//agent: {
+					//keepAlive: true,
+					//keepAliveMsecs: 180000,
+				//}				
 			};
 
 			if (argv.cacert) {
@@ -188,7 +188,10 @@ function insertChunk() {
 			console.log(bulkBody.length);
 
 
-			console.log(options);
+			// Clone options without password for safe logging
+			const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
+			console.log(optionsToLog);
+			//console.log(options);
 			var client = new elasticsearch.Client(options);
 
 			try {			
