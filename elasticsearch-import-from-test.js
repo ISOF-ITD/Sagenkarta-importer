@@ -164,7 +164,28 @@ function insertChunk() {
 				// Create a custom agent with rejectUnauthorized set to false
 				tls: {
 					rejectUnauthorized: false
-				}	
+				},	
+				//compression: 'gzip', // Enable HTTP compression
+				//headers: {
+					//'Connection': 'keep-alive' // Maintain open connections for longer
+ 				//},
+				// This setup should help you handle connection issues during bulk inserts by fine-tuning the client configuration
+				//requestTimeout: 180000,
+				//timeout: 180,  // Increase timeout
+				retryOnTimeout: true,  // Enable retry on timeout
+				maxRetries: 10,
+				sniffOnStart: false,
+				sniffInterval: false,
+				sniffOnConnectionFault: true,
+				keepAlive: true,
+				maxSockets: 25//,
+				//agent: {
+					//keepAlive: true,
+					//keepAliveMsecs: 180000,
+					//maxSockets: Infinity,   // Adjust based on load capacity
+					//maxFreeSockets: 10
+				//}
+
 			};
 
 			if (argv.cacert) {
@@ -175,8 +196,10 @@ function insertChunk() {
 			}
 			console.log(bulkBody.length);
 
-
-			console.log(options);
+			// Clone options without password for safe logging
+ 			const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
+ 			console.log(optionsToLog);
+ 			//console.log(options);
 			var client = new elasticsearch.Client(options);
 
 			try {			
