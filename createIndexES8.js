@@ -19,10 +19,10 @@ if (argv.nooptions) {
 		node: esHost,
 		apiVersion: '8.x',
 		auth: {
-            username: argv.user,
-            password: argv.password
-			//username: 'your-username',
-			//password: 'your-password'
+            //username: argv.user,
+            //password: argv.password
+			username: 'elastic',
+			password: 'cUyTGgNkRHck1RYMnii2'
 		},
 		// Create a custom agent with rejectUnauthorized set to false
 		tls: {
@@ -42,6 +42,9 @@ var client = new elasticsearch.Client(options);
 
 console.log(argv.host + ' ' + argv.index);
 console.log(new Date().toLocaleString());
+// Clone options without password for safe logging
+const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
+console.log(optionsToLog);
 
 client.indices.create({
 	index: argv.index || 'sagenkarta',
