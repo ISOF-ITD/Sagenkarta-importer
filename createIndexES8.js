@@ -19,10 +19,10 @@ if (argv.nooptions) {
 		node: esHost,
 		apiVersion: '8.x',
 		auth: {
-            //username: argv.user,
-            //password: argv.password
-			username: 'elastic',
-			password: 'cUyTGgNkRHck1RYMnii2'
+            username: argv.user,
+            password: argv.password
+			//username: 'elastic',
+			//password: 'X'
 		},
 		// Create a custom agent with rejectUnauthorized set to false
 		tls: {
