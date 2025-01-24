@@ -68,7 +68,7 @@ function insertChunk() {
 		var records = body.results;
 
 		//console.log('records.length');
-		console.log(records.length);
+		if (records) console.log(records.length);
 		if (records.length > 0) {		
 			var bulkBody = [];
 
