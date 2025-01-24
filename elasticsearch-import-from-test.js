@@ -76,6 +76,7 @@ function insertChunk() {
 			_.each(records, function(item, index) {
 				//console.log('before bulkBody push');
 				//console.log(bulkBody);
+				if (currentPage % 100 === 0) console.log(bulkBody);
 				bulkBody.push({
 						index: {
 							_index: argv.index || 'sagenkarta',
@@ -198,7 +199,7 @@ function insertChunk() {
 
 			// Clone options without password for safe logging
  			const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
- 			console.log(optionsToLog);
+ 			if (currentPage < 100) console.log(optionsToLog);
  			//console.log(options);
 			var client = new elasticsearch.Client(options);
 
