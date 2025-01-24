@@ -203,9 +203,9 @@ function insertChunk() {
 			var client = new elasticsearch.Client(options);
 
 			try {			
-				console.log('before client.bulk');
+				console.log(new Date().toLocaleString() + ': Before client.bulk');
 				console.log(bulkBody.length);
-				// Updated code accroding to javascript-api version 8.14 from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/bulk_examples.html
+				// Updated code according to javascript-api version 8.14 from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/bulk_examples.html
 				// await function instead of return function 
 				const response = await client.bulk({
 					body: bulkBody
@@ -246,7 +246,7 @@ function insertChunk() {
 						console.log('Stop at '+currentPage);
 					}
 				}); */
-				console.log('after client.bulk');
+				console.log(new Date().toLocaleString() + ': After client.bulk');
 			} catch (error) {
 				console.error('Error executing bulk insert:', error);
 			}
