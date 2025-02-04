@@ -76,7 +76,7 @@ function insertChunk() {
 			_.each(records, function(item, index) {
 				//console.log('before bulkBody push');
 				//console.log(bulkBody);
-				if (currentPage % 100 === 0) console.log(bulkBody);
+				//if (currentPage !== 0 && currentPage % 100 === 0) console.log(bulkBody);
 				bulkBody.push({
 						index: {
 							_index: argv.index || 'sagenkarta',
