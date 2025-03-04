@@ -557,6 +557,16 @@ client.indices.create({
 						// Idag utan nested MEN krävs för sökbarhet där varje rad (objekt) är oberoende av varandra
 						type: 'nested',
 						properties: {
+							description: {
+								properties: {
+								  start: {
+									type: 'text'
+								  },
+								  text: {
+									type: 'text',
+								  }
+								}
+							},
 							source: {
 								type: 'text',
 								fields: {
