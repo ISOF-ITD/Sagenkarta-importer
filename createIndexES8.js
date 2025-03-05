@@ -559,12 +559,56 @@ client.indices.create({
 						properties: {
 							description: {
 								properties: {
-								  start: {
-									type: 'text'
-								  },
-								  text: {
-									type: 'text',
-								  }
+									start: {
+										type: 'text'
+									},
+									text: {
+										type: 'text',
+										analyzer: 'swedish',
+										term_vector: 'with_positions_offsets',
+										fields: {
+											raw: {
+												type: 'text',
+												analyzer: 'simple'
+											}
+										}
+									},
+									terms: {
+										properties: {
+											term: {
+												type: 'text'
+											},
+											termid: {
+												type: 'keyword',
+												index: 'true'
+											}
+										}
+									}
+								}
+							},
+							utterances: {
+								properties: {
+									start: {
+										type: 'float'
+									},
+									end: {
+										type: 'float'
+									},
+									text: {
+										type: 'text',
+										analyzer: 'swedish',
+										term_vector: 'with_positions_offsets',
+										fields: {
+											raw: {
+												type: 'text',
+												analyzer: 'simple'
+											}
+										}
+									},
+									speaker: {
+										type: 'keyword',
+										index: 'true'
+									},
 								}
 							},
 							source: {
