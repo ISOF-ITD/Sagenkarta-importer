@@ -560,7 +560,7 @@ client.indices.create({
 							description: {
 								properties: {
 									start: {
-										type: 'text'
+										type: 'keyword'
 									},
 									text: {
 										type: 'text',
@@ -576,7 +576,7 @@ client.indices.create({
 									terms: {
 										properties: {
 											term: {
-												type: 'text'
+												type: 'keyword'
 											},
 											termid: {
 												type: 'keyword',
