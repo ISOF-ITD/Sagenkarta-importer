@@ -558,6 +558,7 @@ client.indices.create({
 						type: 'nested',
 						properties: {
 							description: {
+								type: 'nested',
 								properties: {
 									start: {
 										type: 'keyword'
@@ -587,6 +588,7 @@ client.indices.create({
 								}
 							},
 							utterances: {
+								type: 'nested',
 								properties: {
 									start: {
 										type: 'float'
