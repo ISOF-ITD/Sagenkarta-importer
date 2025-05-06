@@ -46,6 +46,25 @@ console.log(new Date().toLocaleString());
 const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
 console.log(optionsToLog);
 
+const textFieldMapping = {
+  text: {
+    type: "text",
+    analyzer: "swedish",
+    search_analyzer: "swedish", // Ensures search uses same rules as indexing
+    term_vector: "with_positions_offsets",
+    fields: {
+      simple: {
+        type: "text",
+        analyzer: "simple"
+      },
+      keyword: {
+        type: "keyword",
+        ignore_above: 256
+      }
+    }
+  }
+};
+
 client.indices.create({
 	index: argv.index || 'sagenkarta',
 	body: {
@@ -563,17 +582,7 @@ client.indices.create({
 									start: {
 										type: 'keyword'
 									},
-									text: {
-										type: 'text',
-										analyzer: 'swedish',
-										term_vector: 'with_positions_offsets',
-										fields: {
-											raw: {
-												type: 'text',
-												analyzer: 'simple'
-											}
-										}
-									},
+                                    ...textFieldMapping
 									terms: {
 										properties: {
 											term: {
