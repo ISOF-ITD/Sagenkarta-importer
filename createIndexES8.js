@@ -46,6 +46,8 @@ console.log(new Date().toLocaleString());
 const optionsToLog = { ...options, auth: { ...options.auth, password: '*****' } };
 console.log(optionsToLog);
 
+// Define the mapping for double nested text fields to be searchable
+// Does not yet support highlight
 const textFieldMapping = {
   text: {
     type: "text",
@@ -582,7 +584,7 @@ client.indices.create({
 									start: {
 										type: 'keyword'
 									},
-                                    ...textFieldMapping
+                                    ...textFieldMapping,
 									terms: {
 										properties: {
 											term: {
@@ -605,17 +607,7 @@ client.indices.create({
 									end: {
 										type: 'float'
 									},
-									text: {
-										type: 'text',
-										analyzer: 'swedish',
-										term_vector: 'with_positions_offsets',
-										fields: {
-											raw: {
-												type: 'text',
-												analyzer: 'simple'
-											}
-										}
-									},
+                                    ...textFieldMapping,
 									speaker: {
 										type: 'keyword',
 										index: 'true'
