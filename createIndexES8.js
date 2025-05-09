@@ -599,51 +599,32 @@ client.indices.create({
 								}
 							},
                             utterances: {
-        						properties: {
-                                    utterances: {
-                                        type: 'nested',
-                                        properties: {
-                                            start: {
-                                                type: 'float'
-                                            },
-                                            end: {
-                                                type: 'float'
-                                            },
-                                            ...textFieldMapping,
-                                            speaker: {
-                                                type: 'keyword',
-                                                index: 'true'
-                                            }
-                                        }
+                                utterances: {
+                                  type: "nested",
+                                  properties: {
+                                    start: { type: "float" },
+                                    end: { type: "float" },
+                                    speaker: { type: "keyword" },
+                                    ...textFieldMapping,
                                     }
                                 },
                                 metadata: {
-            						properties: {
-                                        asr: {
-                                            properties: {
-                                                method: {
-                                                    type: 'keyword',
-                                                    //index: 'true'
-                                                },
-                                                model: {
-                                                    type: 'keyword',
-                                                    //index: 'true'
-                                                },
-                                                date: {
-                                                    type: 'keyword',
-                                                    //index: 'true'
-                                                },
-                                            },
-                                            status: {
-                                                properties: {
-                                                    code: {
-                                                        type: 'keyword',
-                                                        //index: 'true'
-                                                    }
-                                                }
-                                            }
-                                        }
+                                  // type: "object",
+                                  properties: {
+                                    asr: {
+                                      properties: {
+                                        method: { type: "keyword" },
+                                        model: { type: "keyword" },
+                                        date: { type: "keyword" }
+                                      }
+                                    },
+                                    status: {
+                                      // type: "object",
+                                      properties: {
+                                        code: { type: "keyword" }
+                                      }
                                     }
+                                  }
                                 }
                             },
 							source: {
