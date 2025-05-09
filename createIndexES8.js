@@ -599,6 +599,8 @@ client.indices.create({
 								}
 							},
                             utterances: {
+                              // type: "object",
+                              properties: {
                                 utterances: {
                                   type: "nested",
                                   properties: {
@@ -626,6 +628,7 @@ client.indices.create({
                                     }
                                   }
                                 }
+                            }
                             },
 							source: {
 								type: 'text',
