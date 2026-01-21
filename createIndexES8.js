@@ -74,6 +74,12 @@ client.indices.create({
 			"number_of_shards": 1,
 			"number_of_replicas": 0,
 			"analysis": {
+				"normalizer": {
+					"lowercase_normalizer": {
+						"type": "custom",
+						"filter": ["lowercase"]
+					}
+				},
 				"filter": {
 					"swedish_stop": {
 						"type": "stop",
@@ -350,7 +356,14 @@ client.indices.create({
 								type: 'text'
 							},
 							archive_id: {
-								type: 'text'
+								type: 'text',
+								fields: {
+									keyword: {
+										type: 'keyword',
+										normalizer: 'lowercase_normalizer',
+										ignore_above: 512
+									}
+								}
 							},
 							archive_id_row: {
 								// Type text to be part of full text search
