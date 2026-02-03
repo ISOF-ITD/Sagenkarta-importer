@@ -365,6 +365,9 @@ client.indices.create({
 									}
 								}
 							},
+							archive_id_display_search: {
+								type: 'keyword',
+							},
 							archive_id_row: {
 								// Type text to be part of full text search
 								type: 'text',
