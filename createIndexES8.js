@@ -441,6 +441,10 @@ client.indices.create({
 										type: 'text',
 										analyzer: 'simple',
 										fielddata: true
+									},
+									keyword: {
+										type: 'keyword',
+										ignore_above: 512
 									}
 								},
 								copy_to: 'search_other'
